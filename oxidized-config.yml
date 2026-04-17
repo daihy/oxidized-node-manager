@@ -1,0 +1,42 @@
+---
+username: admin
+password: admin
+interval: 3600
+use_syslog: false
+debug: true
+threads: 30
+timeout: 300
+retries: 3
+prompt: !ruby/regexp /^([\.\w.@-]+[#>]|\w+@[\w.]+[#>])/
+prompt_system: /^\S+@\S+[#>]\s*$/
+rest: 0.0.0.0:8269
+
+input:
+  default: ssh, telnet
+  debug: true
+
+ssh:
+  kex: diffie-hellman-group-exchange-sha1
+  ciphers: aes256-ctr,aes192-ctr,aes128-ctr
+
+output:
+  default: git
+  git:
+    user: Oxidized
+    email: oxidized@example.com
+    repo: "/home/oxidized/.config/oxidized/git"
+
+source:
+  default: csv
+  csv:
+    file: "/home/oxidized/.config/oxidized/nodes.csv"
+    delimiter: !ruby/regexp /[,\s]/
+    header: false
+    map:
+      name: 0
+      ip: 1
+      model: 2
+      input: 3
+      port: 4
+      username: 5
+      password: 6

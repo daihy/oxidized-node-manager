@@ -1,0 +1,57 @@
+# Git
+.env
+.env.*
+
+# Docker
+docker-compose*.yml
+docker-compose*.yaml
+
+# Test/Debug files
+test_*.ps1
+test_*.py
+debug*.txt
+cookies.txt
+
+# Ruby/Expect scripts in root (duplicates)
+*.rb
+*.exp
+
+# Root tests directory
+/tests/
+
+# Oxidized scripts in root (duplicates)
+huawei*.rb
+exec*.rb
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Oxidized internal directories (avoid symlink issues)
+oxidized-config/oxidized/
+
+# Oxidized nodes database - generated at runtime, not tracked
+oxidized-config/nodes.csv
+oxidized-config/nodes.db
+nodes.csv
+
+# Backup files
+*.bak
+*~
+*.backup
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+.pytest_cache/
+
+# Oxidized credentials - contains sensitive data, never track
+oxidized-config/credentials.json
