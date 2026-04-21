@@ -4,21 +4,38 @@ Network device configuration backup management system, built on Oxidized, provid
 
 ## Changelog
 
-### v1.1.0 (2026-01-xx)
+> 📋 **Full changelog: [CHANGELOG.md](CHANGELOG.md)**
 
-#### Bug Fixes
+### v1.2.0 (2026-04-21) ⚠️ MAJOR UPGRADE
 
-- **Oxidized OID Cache Stale Fix** - When Oxidized's `@gitcache` holds stale OID → node mappings, the version history API now supports an `epoch` parameter to read git repository history directly, bypassing Oxidized's in-memory cache. Fixes the issue where version history fails to load after device IP changes.
-- **Version History Time Parsing Fix** - The Dashboard frontend now converts ISO time strings to Unix epoch before calling the API, fixing version history loading failures caused by incorrect time parameter formatting.
-- **Logout Redirect Fix** - Fixed logout redirecting to hardcoded `/login` path instead of Flask Blueprint `pages.login`; now correctly uses `redirect(url_for('pages.login'))`.
+> **🔴 Core Refactoring**: This release includes application architecture refactoring, complete UI rewrite, and new API modules.
 
 #### New Features
 
-- **Fetch Version Config by OID + Epoch** - New `GET /api/oxidized/node_version_by_oid` endpoint accepts `oid` and `epoch` parameters to directly read the config file at a specific timestamp from the git repository, bypassing Oxidized's OID cache.
+- **Complete Frontend Refactoring** - Split 3000+ lines of inline HTML from `app.py` into separate `templates/` and `static/` directories
+  - `templates/dashboard.html` - New Dashboard page (node management, version history, config comparison)
+  - `templates/login.html` - Standalone login page
+  - `templates/force_change_password.html` - Force change password page
+  - `static/css/*.css` - Separate stylesheets
+  - `static/js/dashboard.js` (1747 lines) - Dashboard JavaScript logic
+  - `static/js/i18n.js` (557 lines) - Internationalization support (EN/ZH toggle)
+
+- **New API Modules**: Groups API, Credentials API, Models API, Config API
+- **New Pages Blueprint** - `routes/pages.py`
+- **New Config Service** - `services/config_service.py`
+- **New Group Model** - `models/group.py`
+
+#### Bug Fixes
+
+- **Oxidized OID Cache Stale Fix** - New `epoch` parameter reads git repo directly, bypassing Oxidized's in-memory cache
+- **Version History Time Parsing Fix** - Dashboard converts ISO time to Unix epoch before API calls
+- **Logout Redirect Fix** - `redirect(url_for('pages.login'))` instead of hardcoded `/login`
 
 #### Improvements
 
-- **Removed Huawei SSH Input Script** - Deleted `oxidized-config/input/huaweissh.rb`, now using `oxidized-config/model/huawei.rb` for unified handling, simplifying the architecture.
+- Removed `huaweissh.rb`, unified `model/huawei.rb`
+- `nginx-proxy.conf` gzip compression enabled
+- All README files updated with full changelog
 
 ### v1.0.0 (2026-01-10)
 

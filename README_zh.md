@@ -4,21 +4,38 @@
 
 ## 更新日志
 
-### v1.1.0 (2026-01-xx)
+> 📋 **完整更新日志请查看 [CHANGELOG.md](CHANGELOG.md)**
 
-#### 错误修复
+### v1.2.0 (2026-04-21) ⚠️ 重大升级
 
-- **Oxidized OID 缓存 stale 问题修复** - 当 Oxidized 的 `@gitcache` 持有过期的 OID → node 映射时，版本历史 API 现在支持通过 `epoch` 参数直接读取 git 仓库历史，不再依赖 Oxidized 的内存缓存。解决了设备 IP 变更后版本历史无法加载的问题。
-- **版本历史时间解析修复** - 前端 Dashboard 现在将 ISO 时间字符串转换为 Unix epoch 再调用 API，解决了时间参数传递错误导致的版本历史加载失败问题。
-- **登出重定向修复** - 修复登出后重定向到硬编码 `/login` 路径而非 Flask Blueprint `pages.login` 的问题，现在正确使用 `redirect(url_for('pages.login'))`。
+> **🔴 核心重构**：本次更新包含程序架构重构、UI 完全重写、新增多个 API 模块。
 
-#### 新功能
+#### 🚀 新增功能
 
-- **按 OID + Epoch 获取版本配置** - 新增 `GET /api/oxidized/node_version_by_oid` 接口，接受 `oid` 和 `epoch` 参数，直接从 git 仓库读取指定时间的配置文件，绕过 Oxidized 的 OID 缓存。
+- **前端完全重构** - `app.py` 3000+ 行内联模板 → `templates/` + `static/` 独立目录
+  - `templates/dashboard.html` - 全新 Dashboard 页面（节点管理、版本历史、配置对比）
+  - `templates/login.html` - 独立登录页面
+  - `templates/force_change_password.html` - 强制修改密码页面
+  - `static/css/*.css` - 独立样式文件
+  - `static/js/dashboard.js` (1747行) - Dashboard JavaScript 逻辑
+  - `static/js/i18n.js` (557行) - 国际化支持（中英文切换）
 
-#### 改进
+- **新增 Groups/Credentials/Models/Config API** - 设备分组、凭证、型号、配置管理接口
+- **新增 Pages Blueprint** - `routes/pages.py`
+- **新增 Config Service** - `services/config_service.py`
+- **新增 Group Model** - `models/group.py`
 
-- **移除华为 SSH Input 脚本** - 删除了 `oxidized-config/input/huaweissh.rb`，改用 `oxidized-config/model/huawei.rb` 统一处理，简化架构。
+#### 🐛 错误修复
+
+- **Oxidized OID 缓存 stale 问题修复** - 新增 `epoch` 参数直接读取 git 仓库，绕过 Oxidized 内存缓存
+- **版本历史时间解析修复** - Dashboard 将 ISO 时间转换为 Unix epoch 再调用 API
+- **登出重定向修复** - `redirect(url_for('pages.login'))` 替代硬编码 `/login`
+
+#### 🔧 改进
+
+- 移除 `huaweissh.rb`，统一使用 `model/huawei.rb`
+- `nginx-proxy.conf` 新增 gzip 压缩
+- 所有 README 文件添加完整更新日志
 
 ### v1.0.0 (2026-01-10)
 
