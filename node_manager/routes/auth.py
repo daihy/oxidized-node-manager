@@ -14,12 +14,28 @@ def is_first_time() -> bool:
 
 
 def login_required(f):
-    """Login required decorator."""
+    """Login required decorator - redirects to pages.login_page."""
+
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "username" not in session:
+            return redirect(url_for("pages.login_page"))
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
+def admin_required(f):
+    """Admin required decorator."""
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if "username" not in session:
             return redirect(url_for("auth.login"))
+        from models.user import User
+        user = User.get_by_username(session.get("username"))
+        if not user or user.role != "admin":
+            return jsonify({"success": False, "error": "Admin access required"}), 403
         return f(*args, **kwargs)
 
     return decorated_function
@@ -107,7 +123,7 @@ def check_setup_status():
 def logout():
     """User logout."""
     session.pop("username", None)
-    return redirect(url_for("auth.login"))
+    return redirect(url_for("pages.login_page"))
 
 
 @auth_bp.route("/api/user-info")
@@ -169,6 +185,11 @@ def users_api():
         return jsonify([u.to_dict() for u in users])
 
     if request.method == "POST":
+        # Admin only for creating users
+        current_user = User.get_by_username(session.get("username"))
+        if not current_user or current_user.role != "admin":
+            return jsonify({"success": False, "error": "Admin access required"}), 403
+
         data = request.json
         username = data.get("username", "").strip()
         password = data.get("password", "")
@@ -196,10 +217,12 @@ def users_api():
 @auth_bp.route("/api/users/<username>", methods=["DELETE"])
 @login_required
 def delete_user(username):
-    """Delete a user."""
-    current_user = session.get("username")
+    """Delete a user. Admin only."""
+    current_user = User.get_by_username(session.get("username"))
+    if not current_user or current_user.role != "admin":
+        return jsonify({"success": False, "error": "Admin access required"}), 403
 
-    if username == current_user:
+    if username == current_user.username:
         return jsonify({"success": False, "error": "不能删除自己"})
 
     user = User.get_by_username(username)
@@ -213,7 +236,11 @@ def delete_user(username):
 @auth_bp.route("/api/users-admin-change-password", methods=["POST"])
 @login_required
 def users_admin_change_password():
-    """Admin change user password."""
+    """Admin change user password. Admin only."""
+    current_user = User.get_by_username(session.get("username"))
+    if not current_user or current_user.role != "admin":
+        return jsonify({"success": False, "error": "Admin access required"}), 403
+
     data = request.json
     username = data.get("username", "")
     new_password = data.get("new_password", "")
@@ -234,5 +261,28 @@ def users_admin_change_password():
 
     user.password_hash = User.hash_password(new_password)
     user.save()
+
+    return jsonify({"success": True})
+
+
+@auth_bp.route("/api/force-change-password", methods=["POST"])
+@login_required
+def force_change_password():
+    """首次登录强制修改密码"""
+    # Lazy import to avoid circular dependency
+    import app
+    data = request.json
+    users = app.load_users()
+    username = session.get("username")
+
+    current_password = data.get("current_password")
+    new_password = data.get("new_password")
+
+    if users.get(username) != current_password:
+        return jsonify({"success": False, "error": "Current password is incorrect"})
+
+    users[username] = new_password
+    app.save_users(users)
+    app.mark_password_as_changed(username)
 
     return jsonify({"success": True})

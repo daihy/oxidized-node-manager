@@ -2,6 +2,34 @@
 
 Network device configuration backup management system, built on Oxidized, providing Web UI for node management and status monitoring.
 
+## Changelog
+
+### v1.1.0 (2026-01-xx)
+
+#### Bug Fixes
+
+- **Oxidized OID Cache Stale Fix** - When Oxidized's `@gitcache` holds stale OID → node mappings, the version history API now supports an `epoch` parameter to read git repository history directly, bypassing Oxidized's in-memory cache. Fixes the issue where version history fails to load after device IP changes.
+- **Version History Time Parsing Fix** - The Dashboard frontend now converts ISO time strings to Unix epoch before calling the API, fixing version history loading failures caused by incorrect time parameter formatting.
+- **Logout Redirect Fix** - Fixed logout redirecting to hardcoded `/login` path instead of Flask Blueprint `pages.login`; now correctly uses `redirect(url_for('pages.login'))`.
+
+#### New Features
+
+- **Fetch Version Config by OID + Epoch** - New `GET /api/oxidized/node_version_by_oid` endpoint accepts `oid` and `epoch` parameters to directly read the config file at a specific timestamp from the git repository, bypassing Oxidized's OID cache.
+
+#### Improvements
+
+- **Removed Huawei SSH Input Script** - Deleted `oxidized-config/input/huaweissh.rb`, now using `oxidized-config/model/huawei.rb` for unified handling, simplifying the architecture.
+
+### v1.0.0 (2026-01-10)
+
+- Initial release
+- Node management and status monitoring
+- Configuration version comparison
+- Credential management
+- Custom Huawei device model support
+
+---
+
 ## Features
 
 - **Node Management** - Add, edit, delete network device nodes
@@ -28,13 +56,13 @@ Network device configuration backup management system, built on Oxidized, provid
               └─────┬─────┘        └──────┬──────┘
                     │                     │
                     │            ┌────────┴────────┐
-                    │            │  SQLite DB     │
-                    │            │  (nodes.db)   │
+                    │            │  SQLite DB       │
+                    │            │  (nodes.db)      │
                     │            └────────────────┘
                     │
-         ┌─────────┴─────────┐
-         │/var/run/docker.sock│
-         └───────────────────┘
+          ┌─────────┴─────────┐
+          │/var/run/docker.sock│
+          └───────────────────┘
 ```
 
 ## Project Structure
@@ -45,7 +73,7 @@ oxidized-node-manager/
 ├── nginx-proxy.conf              # Nginx reverse proxy configuration
 ├── package_deploy.sh            # One-click deployment script
 ├── .env.template                # Environment variables template
-│
+│   │
 ├── node_manager/                # Flask Web Application
 │   ├── app.py                   # Main application entry
 │   ├── database.py              # SQLite database operations
@@ -67,8 +95,7 @@ oxidized-node-manager/
     ├── credentials.json        # Device credentials
     ├── models.json              # Enabled device models
     ├── nodes.db                # SQLite database
-    ├── input/                   # Custom input scripts
-    │   └── huaweissh.rb        # Huawei SSH input
+    ├── input/                   # Custom input scripts (reserved)
     └── model/                   # Custom model scripts
         └── huawei.rb            # Huawei model
 ```
@@ -258,26 +285,19 @@ end
 | `---- More ----` filter | Auto-filter pagination prompt |
 | `pre_logout "quit"` | Execute quit before logout |
 
-### Huawei SSH Input (`oxidized-config/input/huaweissh.rb`)
+### Huawei Model Features
 
-Custom SSH input script, solving compatibility issues with legacy Huawei devices:
+The `huawei.rb` model integrates all necessary features for Huawei device backup:
 
-#### Problems Solved
-
-| Problem | Solution |
-|--------|----------|
-| Non-standard SSH port | Support custom ports (e.g., 32410) |
-| Legacy Huawei device SSH | Use `diffie-hellman-group-exchange-sha1` algorithm |
-| SSH password interaction | Use Expect to auto-send password |
-| Configuration pagination | Auto-handle `---- More ----` pagination |
-| Long configuration output | Wait for complete configuration before exit |
-
-#### Technical Features
-
-- Uses Ruby PTY/Expect for automated SSH sessions
-- Auto-handles SSH host key verification
-- 120-second timeout for configuration output
-- Supports Telnet protocol (via variants of `huaweissh.rb`)
+| Feature | Description |
+|--------|-------------|
+| Non-standard SSH port | Support via `vars:ssh_port` in CSV configuration |
+| Legacy SSH algorithm | Uses `diffie-hellman-group-exchange-sha1` for older devices |
+| `display version` | Captures system version info with `#` comment prefix |
+| `display device` | Captures device info with `#` comment prefix |
+| `display current-configuration` | Gets complete running configuration |
+| `screen-length 0 temporary` | Disables output pagination |
+| `---- More ----` filter | Auto-filters pagination prompts |
 
 ### Usage
 

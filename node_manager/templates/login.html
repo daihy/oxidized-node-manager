@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Login - Oxidized Node Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+    <button class="btn lang-switch" onclick="switchLanguage()" id="langBtn">
+        <svg class="globe-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+        </svg>
+        <span class="lang-text">EN</span>
+    </button>
+
+    <div class="login-container">
+        <h1 id="login-title">Login</h1>
+        <p id="login-subtitle">Oxidized Node Management System</p>
+        
+        <div id="alert" class="alert"></div>
+        
+        <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label id="username-label">Username</label>
+                <input type="text" id="username" required autofocus>
+            </div>
+            <div class="form-group">
+                <label id="password-label">Password</label>
+                <div class="password-input-group">
+                    <input type="password" id="password" required>
+                    <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password')">👁️</button>
+                </div>
+            </div>
+            <button type="submit" class="btn" id="login-btn">Login</button>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
+    <script>
+        function updateUI() {
+            document.getElementById('login-title').textContent = t('login_title');
+            document.getElementById('login-subtitle').textContent = t('login_subtitle');
+            document.getElementById('username-label').textContent = t('username_label');
+            document.getElementById('password-label').textContent = t('password_label');
+            document.getElementById('login-btn').textContent = t('login_btn');
+            document.querySelector('#langBtn .lang-text').textContent = t('lang_switch');
+        }
+
+        // Apply initial language on page load if not English
+        if (currentLang === 'zh') {
+            updateUI();
+        }
+
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const button = event.target;
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.textContent = '👁️‍🗨️';
+            } else {
+                input.type = 'password';
+                button.textContent = '👁️';
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            fetch('/api/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({username, password})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.must_change_password) {
+                        window.location.href = '/force-change-password';
+                    } else {
+                        window.location.href = '/dashboard';
+                    }
+                } else {
+                    const alert = document.getElementById('alert');
+                    alert.textContent = t('login_error');
+                    alert.classList.add('error');
+                    alert.style.display = 'block';
+                }
+            });
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>

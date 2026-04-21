@@ -73,6 +73,12 @@ def init_database():
             )
         """)
 
+        # Migration: Add must_change_password column if it doesn't exist (for existing databases)
+        try:
+            cursor.execute("ALTER TABLE users ADD COLUMN must_change_password INTEGER DEFAULT 0")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+
         # Sync log table
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS sync_log (
@@ -83,9 +89,59 @@ def init_database():
             )
         """)
 
+        # Config settings table (key-value store for app settings)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS config_settings (
+                key TEXT PRIMARY KEY,
+                value TEXT,
+                category TEXT NOT NULL DEFAULT 'general',
+                updated_at TEXT DEFAULT (datetime('now'))
+            )
+        """)
+
+        # Config versions table for configuration history
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS config_versions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                version INTEGER NOT NULL,
+                config_content TEXT NOT NULL,
+                config_hash TEXT NOT NULL,
+                commit_message TEXT,
+                created_at TEXT DEFAULT (datetime('now')),
+                created_by TEXT DEFAULT 'admin'
+            )
+        """)
+
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_config_versions_version
+            ON config_versions(version DESC)
+        """)
+
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_config_versions_created_at
+            ON config_versions(created_at DESC)
+        """)
+
         # Create indexes
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_nodes_name ON nodes(name)")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_nodes_ip ON nodes(ip)")
+
+        # --- Groups feature migration/setup ---
+        # 1) Create groups table if not exists
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS groups (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT UNIQUE NOT NULL,
+                description TEXT DEFAULT '',
+                created_at TEXT DEFAULT (datetime('now'))
+            )
+        """
+        )
+        # 2) Add group_id column to nodes table (idempotent)
+        try:
+            cursor.execute("ALTER TABLE nodes ADD COLUMN group_id INTEGER REFERENCES groups(id)")
+        except Exception:
+            pass
 
     # Create default admin user if no users exist
     _create_default_admin_user()
@@ -142,6 +198,30 @@ def get_all_nodes() -> List[Dict[str, Any]]:
         )
         columns = [desc[0] for desc in cursor.description]
         return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+
+def get_config_setting(key: str, default: str = "") -> str:
+    """Get a config setting value."""
+    with get_db_cursor() as cursor:
+        cursor.execute("SELECT value FROM config_settings WHERE key = ?", (key,))
+        row = cursor.fetchone()
+        return row["value"] if row else default
+
+
+def set_config_setting(key: str, value: str, category: str = "general"):
+    """Set a config setting value."""
+    with get_db_cursor() as cursor:
+        cursor.execute(
+            """
+            INSERT INTO config_settings (key, value, category, updated_at)
+            VALUES (?, ?, ?, datetime('now'))
+            ON CONFLICT(key) DO UPDATE SET
+                value = excluded.value,
+                category = excluded.category,
+                updated_at = datetime('now')
+            """,
+            (key, value, category),
+        )
 
 
 def ensure_csv_synced() -> bool:

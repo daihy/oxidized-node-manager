@@ -2,6 +2,34 @@
 
 网络设备配置备份管理系统，基于 Oxidized 构建，提供 Web UI 进行节点管理和状态监控。
 
+## 更新日志
+
+### v1.1.0 (2026-01-xx)
+
+#### 错误修复
+
+- **Oxidized OID 缓存 stale 问题修复** - 当 Oxidized 的 `@gitcache` 持有过期的 OID → node 映射时，版本历史 API 现在支持通过 `epoch` 参数直接读取 git 仓库历史，不再依赖 Oxidized 的内存缓存。解决了设备 IP 变更后版本历史无法加载的问题。
+- **版本历史时间解析修复** - 前端 Dashboard 现在将 ISO 时间字符串转换为 Unix epoch 再调用 API，解决了时间参数传递错误导致的版本历史加载失败问题。
+- **登出重定向修复** - 修复登出后重定向到硬编码 `/login` 路径而非 Flask Blueprint `pages.login` 的问题，现在正确使用 `redirect(url_for('pages.login'))`。
+
+#### 新功能
+
+- **按 OID + Epoch 获取版本配置** - 新增 `GET /api/oxidized/node_version_by_oid` 接口，接受 `oid` 和 `epoch` 参数，直接从 git 仓库读取指定时间的配置文件，绕过 Oxidized 的 OID 缓存。
+
+#### 改进
+
+- **移除华为 SSH Input 脚本** - 删除了 `oxidized-config/input/huaweissh.rb`，改用 `oxidized-config/model/huawei.rb` 统一处理，简化架构。
+
+### v1.0.0 (2026-01-10)
+
+- 初始版本发布
+- 节点管理与状态监控
+- 配置版本对比
+- 凭证管理
+- 自研华为设备型号支持
+
+---
+
 ## 功能特性
 
 - **节点管理** - 添加、编辑、删除网络设备节点
@@ -29,7 +57,7 @@
                      │                     │
                      │            ┌────────┴────────┐
                      │            │  SQLite 数据库   │
-                     │            │  (nodes.db)    │
+                     │            │  (nodes.db)     │
                      │            └────────────────┘
                      │
           ┌─────────┴─────────┐
@@ -67,8 +95,7 @@ oxidized-node-manager/
     ├── credentials.json        # 设备凭据
     ├── models.json              # 启用的设备型号
     ├── nodes.db                # SQLite 数据库
-    ├── input/                   # 自定义输入脚本
-    │   └── huaweissh.rb        # 华为 SSH 输入
+    ├── input/                   # 自定义输入脚本（预留）
     └── model/                   # 自定义型号脚本
         └── huawei.rb            # 华为型号
 ```
@@ -258,26 +285,19 @@ end
 | `---- More ----` 过滤 | 自动过滤分页提示 |
 | `pre_logout "quit"` | 登出前执行 quit |
 
-### 华为 SSH 输入（`oxidized-config/input/huaweissh.rb`）
+### 华为型号功能
 
-自定义 SSH 输入脚本，解决老款华为设备兼容性问题：
+`huawei.rb` 模型集成所有华为设备备份所需功能：
 
-#### 解决的问题
-
-| 问题 | 解决方案 |
-|------|----------|
-| 非标准 SSH 端口 | 支持自定义端口（如 32410） |
-| 老款华为设备 SSH | 使用 `diffie-hellman-group-exchange-sha1` 算法 |
-| SSH 密码交互 | 使用 Expect 自动发送密码 |
-| 配置分页 | 自动处理 `---- More ----` 分页 |
-| 长配置输出 | 等待完整配置后再退出 |
-
-#### 技术特性
-
-- 使用 Ruby PTY/Expect 实现自动化 SSH 会话
-- 自动处理 SSH 主机密钥验证
-- 配置输出超时 120 秒
-- 支持 Telnet 协议（通过 `huaweissh.rb` 变体）
+| 功能 | 说明 |
+|------|------|
+| 非标准 SSH 端口 | 通过 CSV 配置中的 `vars:ssh_port` 支持 |
+| 老款 SSH 算法 | 使用 `diffie-hellman-group-exchange-sha1` 算法 |
+| `display version` | 捕获系统版本信息，带 `#` 注释前缀 |
+| `display device` | 捕获设备信息，带 `#` 注释前缀 |
+| `display current-configuration` | 获取完整运行配置 |
+| `screen-length 0 temporary` | 禁用输出分页 |
+| `---- More ----` 过滤 | 自动过滤分页提示 |
 
 #### 使用方法
 

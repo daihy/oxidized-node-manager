@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Oxidized Node Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1 id="title">Oxidized Node Management System</h1>
+                <p id="subtitle">Manage and monitor network device backup configurations in real-time</p>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <p id="welcome"></p>
+                    <button class="username-btn" id="usernameBtn" onclick="openChangePasswordModal()"></button>
+                </div>
+                <button class="btn lang-switch" id="langBtn" onclick="switchLanguage()">
+            <svg class="globe-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+            </svg>
+            <span class="lang-text">EN</span>
+        </button>
+                <button class="btn btn-danger" onclick="logout()" id="logout-btn">Logout</button>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('nodes', event)" id="tab-nodes">
+                    <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    <span id="tab-nodes-label">Nodes</span>
+                </button>
+                <button class="tab" onclick="switchTab('add-node', event)" id="tab-add-node">
+                    <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    <span id="tab-add-node-label">Add Node</span>
+                </button>
+                <button class="tab" onclick="switchTab('groups', event)" id="tab-groups">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span id="tab-groups-label">Groups</span>
+                </button>
+                <button class="tab" onclick="switchTab('credentials', event)" id="tab-credentials">
+                    <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <span id="tab-credentials-label">Credentials</span>
+                </button>
+                <button class="tab" onclick="switchTab('models', event)" id="tab-models">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                    <span id="tab-models-label">Models</span>
+                </button>
+                <button class="tab" onclick="switchTab('import', event)" id="tab-import">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span id="tab-import-label">Import</span>
+                </button>
+                <button class="tab" onclick="switchTab('users', event)" id="tab-users">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                    <span id="tab-users-label">Users</span>
+                </button>
+                <button class="tab" onclick="switchTab('config', event)" id="tab-config">
+                    <svg class="icon" viewBox="0 0 24 24">M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96a7.09 7.09 0 00-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84a.48.48 0 00-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87a.49.49 0 00.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.37 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 00-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z</svg>
+                    <span id="tab-config-label">Config</span>
+                </button>
+            </div>
+            
+            <div id="alert" class="alert"></div>
+            
+            <!-- 节点列表 -->
+            <div id="nodes" class="tab-content active">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button class="btn btn-success" onclick="refreshNodes()" id="btn-refresh">
+                            <svg class="icon" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                            <span id="btn-refresh-label">Refresh</span>
+                        </button>
+                        <button class="btn" onclick="refreshOxidizedStatus()" id="btn-refresh-oxidized">
+                            <svg class="icon" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                            <span id="btn-refresh-oxidized-label">Refresh Oxidized Status</span>
+                        </button>
+                        <button class="btn btn-danger" onclick="restartOxidizedContainer()" id="btn-restart-oxidized">
+                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                            <span id="btn-restart-oxidized-label">Restart Oxidized</span>
+                        </button>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-secondary); text-align: right;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div>
+                                <div id="oxidized-info">Backup Interval: <span id="backup-interval-display"><span class="skeleton skeleton-inline" style="width: 60px;"></span></span></div>
+                                <div style="font-size: 11px; color: var(--text-muted);">Global setting for all nodes</div>
+                            </div>
+                            <button class="btn btn-icon" style="padding: 6px 8px;" onclick="openBackupIntervalModal()" title="Configure Backup Interval">
+                                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96a7.09 7.09 0 00-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84a.48.48 0 00-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87a.49.49 0 00.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.37 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 00-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Search and Filter Bar -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
+                    <input type="text" id="nodeSearch" placeholder="Search nodes..." style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; flex: 1;" oninput="filterNodes()">
+                    <select id="nodeGroupFilter" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; min-width: 150px;" onchange="filterNodes()">
+                        <option value="">All Groups</option>
+                    </select>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th id="th-name">Node Name</th>
+                            <th id="th-ip">IP Address</th>
+                            <th id="th-model">Device Model</th>
+                            <th id="th-protocol">Protocol</th>
+                            <th id="th-port">Port</th>
+                            <th id="th-group">Group</th>
+                            <th id="th-oxidized-status">Backup Status</th>
+                            <th id="th-oxidized-last">Last Backup</th>
+                            <th id="th-action">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="nodesList">
+                        <tr class="skeleton-row">
+                            <td><span class="skeleton skeleton-inline" style="width: 100px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 120px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 80px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 60px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 60px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 80px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 80px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 100px;"></span></td>
+                            <td><span class="skeleton skeleton-btn"></span></td>
+                        </tr>
+                        <tr class="skeleton-row">
+                            <td><span class="skeleton skeleton-inline" style="width: 100px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 120px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 80px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 60px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 60px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 80px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 80px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 100px;"></span></td>
+                            <td><span class="skeleton skeleton-btn"></span></td>
+                        </tr>
+                        <tr class="skeleton-row">
+                            <td><span class="skeleton skeleton-inline" style="width: 100px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 120px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 80px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 60px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 60px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 80px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 80px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 100px;"></span></td>
+                            <td><span class="skeleton skeleton-btn"></span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 添加节点 -->
+            <div id="add-node" class="tab-content">
+                <div style="max-width: 500px;">
+                    <form onsubmit="addNode(event)">
+                        <div class="form-group">
+                            <label id="label-name">Node Name</label>
+                            <input type="text" id="nodeName" required>
+                        </div>
+                        <div class="form-group">
+                            <label id="label-ip">IP Address</label>
+                            <input type="text" id="nodeIp" required>
+                        </div>
+                        <div class="form-group">
+                            <label id="label-model">Device Model</label>
+                            <select id="nodeModel" required>
+                                <option value="">Select device model</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label id="label-protocol">Protocol</label>
+                            <select id="nodeProtocol" required onchange="updateNodePort()">
+                                <option value="ssh">SSH</option>
+                                <option value="telnet">Telnet</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label id="label-group">Group</label>
+                            <select id="nodeGroup">
+                                <option value="">No Group</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label id="label-port">Port</label>
+                            <input type="number" id="nodePort" min="1" max="65535" required value="32410">
+                        </div>
+                        <div class="form-group">
+                            <label id="label-credential">Credential</label>
+                            <select id="nodeCredential" onchange="onCredentialChange()">
+                                <option value="">Select credential</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label id="label-username">Username</label>
+                            <input type="text" id="nodeUsername" placeholder="Optional (select credential above)" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label id="label-password">Password</label>
+                            <div class="password-input-group">
+                                <input type="password" id="nodePassword" placeholder="Optional (select credential above)" autocomplete="off">
+                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('nodePassword')">👁️</button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success" id="btn-add">Add Node</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Groups -->
+            <div id="groups" class="tab-content">
+                <div style="margin-bottom: 15px;">
+                    <button class="btn" onclick="loadGroups()" id="btn-refresh-groups">
+                        <svg class="icon" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                        <span>Refresh</span>
+                    </button>
+                    <button class="btn btn-success" onclick="openAddGroupModal()" id="btn-add-group">
+                        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                        <span>Add Group</span>
+                    </button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th id="th-grp-id">ID</th>
+                            <th id="th-grp-name">Name</th>
+                            <th id="th-grp-desc">Description</th>
+                            <th id="th-grp-created">Created</th>
+                            <th id="th-grp-action">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="groups-list">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 模型管理 -->
+            <div id="models" class="tab-content">
+                <div style="margin-bottom: 15px;">
+                    <p style="color: var(--text-secondary); margin-bottom: 10px;">Select device models for the "Add Node" dropdown.</p>
+                    <div style="display: flex; gap: 10px; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: nowrap;">
+                            <input type="text" id="modelSearch" placeholder="Search models..." oninput="filterModels()" style="max-width: 300px;">
+                            <span style="white-space: nowrap;">
+                                <button class="btn" onclick="selectAllModels()" style="margin-right: 5px;">
+                                    <svg class="icon" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                                    <span>Select All</span>
+                                </button>
+                                <button class="btn" onclick="deselectAllModels()">
+                                    <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
+                                    <span>Deselect All</span>
+                                </button>
+                            </span>
+                        </div>
+                        <button class="btn btn-success" onclick="saveModels()">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            <span>Save</span>
+                        </button>
+                    </div>
+                </div>
+                <div style="max-height: 400px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                    <table>
+                        <thead style="position: sticky; top: 0; background: var(--primary); z-index: 10;">
+                            <tr>
+                                <th style="width: 60px; color: var(--text-inverse);">Enable</th>
+                                <th style="color: var(--text-inverse);">Description</th>
+                                <th style="color: var(--text-inverse);">Model ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modelsList">
+                            <tr class="skeleton-row">
+                                <td><span class="skeleton" style="width: 20px; height: 20px; display: inline-block;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 200px;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 100px;"></span></td>
+                            </tr>
+                            <tr class="skeleton-row">
+                                <td><span class="skeleton" style="width: 20px; height: 20px; display: inline-block;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 200px;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 100px;"></span></td>
+                            </tr>
+                            <tr class="skeleton-row">
+                                <td><span class="skeleton" style="width: 20px; height: 20px; display: inline-block;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 200px;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 100px;"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+ 
+            <!-- 凭证管理 -->
+            <div id="credentials" class="tab-content">
+                <div style="margin-bottom: 15px;">
+                    <p style="color: var(--text-secondary); margin-bottom: 10px;" id="cred_title_help">Manage device credentials for quick selection when adding nodes.</p>
+                    <div style="display: flex; gap: 10px; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: nowrap;">
+                            <input type="text" id="credSearch" placeholder="Search credentials..." oninput="filterCredentials()" style="max-width: 300px; height: 100%; box-sizing: border-box;">
+                            <button class="btn" onclick="openAddCredentialModal()" style="white-space: nowrap;">
+                                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                                <span id="btn-add-cred">Add Credential</span>
+                            </button>
+                        </div>
+                        <button class="btn btn-success" onclick="saveCredentials()">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            <span id="btn-save-cred">Save</span>
+                        </button>
+                    </div>
+                </div>
+                <div style="max-height: 400px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                    <table>
+                        <thead style="position: sticky; top: 0; background: var(--primary); z-index: 10;">
+                            <tr>
+                                <th style="width: 60px; color: var(--text-inverse);" id="th-cred-enable">Enable</th>
+                                <th style="color: var(--text-inverse);" id="th-cred-label">Label</th>
+                                <th style="color: var(--text-inverse);" id="th-cred-username">Username</th>
+                                <th style="color: var(--text-inverse);" id="th-cred-description">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody id="credentialsList">
+                            <tr class="skeleton-row">
+                                <td><span class="skeleton" style="width: 20px; height: 20px; display: inline-block;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 120px;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 100px;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 150px;"></span></td>
+                            </tr>
+                            <tr class="skeleton-row">
+                                <td><span class="skeleton" style="width: 20px; height: 20px; display: inline-block;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 120px;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 100px;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 150px;"></span></td>
+                            </tr>
+                            <tr class="skeleton-row">
+                                <td><span class="skeleton" style="width: 20px; height: 20px; display: inline-block;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 120px;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 100px;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 150px;"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 批量导入 -->
+            <div id="import" class="tab-content">
+                <div style="max-width: 600px;">
+                    <p style="margin-bottom: 15px; color: #666;">
+<span id="csv-format-label">CSV Format:</span> <code>name,ip,model,protocol,port,username,password,group</code><br>
+<span id="csv-example-label">Example:</span> <code>router1,192.168.1.1,ios,ssh,32410,admin,password,core-network</code>
+                    </p>
+                    <form onsubmit="importNodes(event)">
+                        <div class="form-group">
+                            <label id="label-csv">Paste CSV Content</label>
+                            <textarea id="csvContent"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success" id="btn-import">Import Nodes</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 用户管理 -->
+            <div id="users" class="tab-content">
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-success" onclick="openAddUserModal()" id="btn-add-user">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                        <span>Add User</span>
+                    </button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th id="th-user-username">Username</th>
+                            <th id="th-user-created">Created</th>
+                            <th id="th-user-action">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersList">
+                        <tr class="skeleton-row">
+                            <td><span class="skeleton skeleton-inline" style="width: 120px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 150px;"></span></td>
+                            <td><span class="skeleton skeleton-btn" style="width: 80px;"></span></td>
+                        </tr>
+                        <tr class="skeleton-row">
+                            <td><span class="skeleton skeleton-inline" style="width: 120px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 150px;"></span></td>
+                            <td><span class="skeleton skeleton-btn" style="width: 80px;"></span></td>
+                        </tr>
+                        <tr class="skeleton-row">
+                            <td><span class="skeleton skeleton-inline" style="width: 120px;"></span></td>
+                            <td><span class="skeleton skeleton-inline" style="width: 150px;"></span></td>
+                            <td><span class="skeleton skeleton-btn" style="width: 80px;"></span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Config Manager -->
+            <div id="config" class="tab-content">
+                <div style="margin-bottom: 20px;">
+                    <h2>
+                        <svg class="icon" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 8px;" viewBox="0 0 24 24">M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96a7.09 7.09 0 00-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84a.48.48 0 00-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87a.49.49 0 00.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.37 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 00-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z</svg>
+                        <span id="config-manager-title">Oxidized Config Manager</span>
+                    </h2>
+                </div>
+
+                <!-- Config Tabs -->
+                <div class="config-tabs" style="margin-bottom: 20px;">
+<button class="config-tab active" onclick="switchConfigTab('basic')" id="cfg-tab-basic">Basic Info</button>
+<button class="config-tab" onclick="switchConfigTab('ssh')" id="cfg-tab-ssh">SSH Settings</button>
+<button class="config-tab" onclick="switchConfigTab('output')" id="cfg-tab-output">Output</button>
+<button class="config-tab" onclick="switchConfigTab('vars')" id="cfg-tab-vars">Vars</button>
+<button class="config-tab" onclick="switchConfigTab('yaml')" id="cfg-tab-yaml">YAML Editor</button>
+<button class="config-tab" onclick="switchConfigTab('versions')" id="cfg-tab-versions">Version History</button>
+                </div>
+
+                <!-- Basic Info Tab -->
+                <div id="cfg-basic" class="config-tab-content active">
+                    <div id="basic-current-status" class="status-box" style="margin-bottom:15px;padding:10px;background:#e8f5e9;border-radius:5px;">
+                        <strong id="basic-status-title">Current System Config:</strong>
+                        <div id="basic-status-content" style="margin-top:5px;font-size:13px;">
+                            <span class="skeleton skeleton-inline" style="width: 150px;"></span>
+                            <span class="skeleton skeleton-inline" style="width: 100px; margin-left: 10px;"></span>
+                        </div>
+                    </div>
+                    <form id="config-basic-form" onsubmit="saveConfigBasic(event)">
+                        <div class="form-group">
+                            <label id="cfg-username-label">Oxidized Username (for device access)</label>
+                            <input type="text" id="cfg-username" placeholder="admin">
+                        </div>
+                        <div class="form-group">
+                            <label id="cfg-password-label">Oxidized Password</label>
+                            <div class="password-input-group">
+                                <input type="password" id="cfg-password" placeholder="password">
+                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('cfg-password')">👁️</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label id="cfg-interval-label">Backup Interval (seconds)</label>
+                            <input type="number" id="cfg-interval" placeholder="7200" min="60">
+                            <small id="cfg-interval-help">Default: 7200 (2 hours)</small>
+                        </div>
+                        <div class="form-group">
+                            <label id="cfg-threads-label">Threads</label>
+                            <input type="number" id="cfg-threads" placeholder="30" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label id="cfg-timeout-label">Timeout (seconds)</label>
+                            <input type="number" id="cfg-timeout" placeholder="300" min="10">
+                        </div>
+                        <div class="form-group">
+                            <label id="cfg-api-token-label">Oxidized REST API Token</label>
+                            <input type="password" id="cfg-api-token" placeholder="API Token for Oxidized Web UI">
+                            <small id="cfg-api-token-help">Optional. Only needed when Oxidized has API authentication enabled. Generate token in Oxidized Web UI → Settings → API Token</small>
+                        </div>
+                        <button type="submit" id="cfg-save-basic-btn" class="btn btn-success">💾 Save Basic Settings</button>
+                    </form>
+                </div>
+
+                <!-- SSH Settings Tab -->
+                <div id="cfg-ssh" class="config-tab-content">
+                    <div id="ssh-current-status" class="status-box" style="margin-bottom:15px;padding:10px;background:#f0f0f0;border-radius:5px;">
+                        <strong id="ssh-status-title">Current System SSH Config:</strong>
+                        <div id="ssh-status-content" style="margin-top:5px;font-size:13px;">
+                            <span class="skeleton skeleton-inline" style="width: 150px;"></span>
+                            <span class="skeleton skeleton-inline" style="width: 100px; margin-left: 10px;"></span>
+                        </div>
+                    </div>
+                    <form id="config-ssh-form" onsubmit="saveConfigSSH(event)">
+                        <div class="form-group">
+                            <label id="ssh-kex-label">SSH Key Exchange Algorithms (KEX)</label>
+                            <div class="checkbox-grid" id="ssh-kex-grid">
+                                <label><input type="checkbox" name="ssh_kex" value="diffie-hellman-group-exchange-sha1"> diffie-hellman-group-exchange-sha1</label>
+                                <label><input type="checkbox" name="ssh_kex" value="diffie-hellman-group14-sha1"> diffie-hellman-group14-sha1</label>
+                                <label><input type="checkbox" name="ssh_kex" value="diffie-hellman-group-exchange-sha256"> diffie-hellman-group-exchange-sha256</label>
+                                <label><input type="checkbox" name="ssh_kex" value="diffie-hellman-group16-sha512"> diffie-hellman-group16-sha512</label>
+                                <label><input type="checkbox" name="ssh_kex" value="diffie-hellman-group18-sha512"> diffie-hellman-group18-sha512</label>
+                                <label><input type="checkbox" name="ssh_kex" value="ecdh-sha2-nistp256"> ecdh-sha2-nistp256</label>
+                                <label><input type="checkbox" name="ssh_kex" value="ecdh-sha2-nistp384"> ecdh-sha2-nistp384</label>
+                                <label><input type="checkbox" name="ssh_kex" value="ecdh-sha2-nistp521"> ecdh-sha2-nistp521</label>
+                            </div>
+                            <button type="button" id="ssh-kex-select-all" class="btn btn-sm" onclick="toggleAll('ssh_kex', true)">Select All</button>
+                            <button type="button" id="ssh-kex-deselect-all" class="btn btn-sm" onclick="toggleAll('ssh_kex', false)">Deselect All</button>
+                        </div>
+                        <div class="form-group">
+                            <label id="ssh-encryption-label">SSH Encryption Algorithms</label>
+                            <div class="checkbox-grid" id="ssh-encryption-grid">
+                                <label><input type="checkbox" name="ssh_encryption" value="aes128-ctr"> aes128-ctr</label>
+                                <label><input type="checkbox" name="ssh_encryption" value="aes192-ctr"> aes192-ctr</label>
+                                <label><input type="checkbox" name="ssh_encryption" value="aes256-ctr"> aes256-ctr</label>
+                                <label><input type="checkbox" name="ssh_encryption" value="aes128-cbc"> aes128-cbc</label>
+                                <label><input type="checkbox" name="ssh_encryption" value="aes192-cbc"> aes192-cbc</label>
+                                <label><input type="checkbox" name="ssh_encryption" value="aes256-cbc"> aes256-cbc</label>
+                                <label><input type="checkbox" name="ssh_encryption" value="aes128-gcm@openssh.com"> aes128-gcm@openssh.com</label>
+                                <label><input type="checkbox" name="ssh_encryption" value="aes256-gcm@openssh.com"> aes256-gcm@openssh.com</label>
+                                <label><input type="checkbox" name="ssh_encryption" value="chacha20-poly1305@openssh.com"> chacha20-poly1305@openssh.com</label>
+                            </div>
+                            <button type="button" id="ssh-encryption-select-all" class="btn btn-sm" onclick="toggleAll('ssh_encryption', true)">Select All</button>
+                            <button type="button" id="ssh-encryption-deselect-all" class="btn btn-sm" onclick="toggleAll('ssh_encryption', false)">Deselect All</button>
+                        </div>
+                        <div class="form-group">
+                            <label id="ssh-hmac-label">SSH HMAC Algorithms</label>
+                            <div class="checkbox-grid" id="ssh-hmac-grid">
+                                <label><input type="checkbox" name="ssh_hmac" value="hmac-sha1"> hmac-sha1</label>
+                                <label><input type="checkbox" name="ssh_hmac" value="hmac-sha2-256"> hmac-sha2-256</label>
+                                <label><input type="checkbox" name="ssh_hmac" value="hmac-sha2-512"> hmac-sha2-512</label>
+                                <label><input type="checkbox" name="ssh_hmac" value="hmac-sha1-etm@openssh.com"> hmac-sha1-etm@openssh.com</label>
+                                <label><input type="checkbox" name="ssh_hmac" value="hmac-sha2-256-etm@openssh.com"> hmac-sha2-256-etm@openssh.com</label>
+                                <label><input type="checkbox" name="ssh_hmac" value="hmac-sha2-512-etm@openssh.com"> hmac-sha2-512-etm@openssh.com</label>
+                            </div>
+                            <button type="button" id="ssh-hmac-select-all" class="btn btn-sm" onclick="toggleAll('ssh_hmac', true)">Select All</button>
+                            <button type="button" id="ssh-hmac-deselect-all" class="btn btn-sm" onclick="toggleAll('ssh_hmac', false)">Deselect All</button>
+                        </div>
+                        <div class="form-group">
+                            <label id="cfg-ssh-secure-label">
+                                <input type="checkbox" id="cfg-ssh-secure"> Enable strict host key verification
+                            </label>
+                        </div>
+                        <button type="submit" id="cfg-save-ssh-btn" class="btn btn-success">💾 Save SSH Settings</button>
+                    </form>
+                </div>
+
+                <!-- Output Tab -->
+                <div id="cfg-output" class="config-tab-content">
+                    <div id="output-current-status" class="status-box" style="margin-bottom:15px;padding:10px;background:#e3f2fd;border-radius:5px;">
+                        <strong id="output-status-title">Current System Config:</strong>
+                        <div id="output-status-content" style="margin-top:5px;font-size:13px;">
+                            <span class="skeleton skeleton-inline" style="width: 150px;"></span>
+                            <span class="skeleton skeleton-inline" style="width: 100px; margin-left: 10px;"></span>
+                        </div>
+                    </div>
+                    <form id="config-output-form" onsubmit="saveConfigOutput(event)">
+                        <div class="form-group">
+                            <label id="cfg-output-default-label">Default Output</label>
+                            <select id="cfg-output-default">
+                                <option value="git">Git</option>
+                                <option value="file">File</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label id="cfg-git-user-label">Git Username</label>
+                            <input type="text" id="cfg-git-user" placeholder="Oxidized">
+                        </div>
+                        <div class="form-group">
+                            <label id="cfg-git-email-label">Git Email</label>
+                            <input type="email" id="cfg-git-email" placeholder="oxidized@example.com">
+                        </div>
+                        <button type="submit" id="cfg-save-output-btn" class="btn btn-success">💾 Save Output Settings</button>
+                    </form>
+                </div>
+
+                <!-- Vars Tab -->
+                <div id="cfg-vars" class="config-tab-content">
+                    <div id="vars-current-status" class="status-box" style="margin-bottom:15px;padding:10px;background:#fff3e0;border-radius:5px;">
+                        <strong id="vars-status-title">Current System Config:</strong>
+                        <div id="vars-status-content" style="margin-top:5px;font-size:13px;">
+                            <span class="skeleton skeleton-inline" style="width: 150px;"></span>
+                            <span class="skeleton skeleton-inline" style="width: 100px; margin-left: 10px;"></span>
+                        </div>
+                    </div>
+                    <form id="config-vars-form" onsubmit="saveConfigVars(event)">
+                        <div class="form-group">
+                            <label id="cfg-vars-ssh-kex-label">
+                                <input type="checkbox" id="cfg-vars-ssh-kex"> Enable SSH KEX override
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label id="cfg-vars-remove-secret-label">
+                                <input type="checkbox" id="cfg-vars-remove-secret"> Enable remove_secret (hide passwords in config)
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label id="cfg-vars-ssh-no-keepalive-label">
+                                <input type="checkbox" id="cfg-vars-ssh-no-keepalive"> Disable SSH keepalive
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label id="cfg-vars-ssh-no-exec-label">
+                                <input type="checkbox" id="cfg-vars-ssh-no-exec"> Disable SSH exec channel
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label id="cfg-vars-metadata-label">
+                                <input type="checkbox" id="cfg-vars-metadata"> Enable metadata comments
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label id="cfg-vars-enable-label">Enable Password (privilege mode)</label>
+                            <input type="password" id="cfg-vars-enable" placeholder="enable password">
+                        </div>
+                        <button type="submit" id="cfg-save-vars-btn" class="btn btn-success">💾 Save Vars Settings</button>
+                    </form>
+                </div>
+
+                <!-- YAML Editor Tab -->
+                <div id="cfg-yaml" class="config-tab-content">
+                    <div style="margin-bottom: 10px;">
+                        <button id="yaml-format-btn" class="btn" onclick="formatYaml()">🎨 Format YAML</button>
+                        <button id="yaml-validate-btn" class="btn" onclick="validateYamlConfig()">✅ Validate</button>
+                        <span id="yaml-validate-status" style="margin-left: 10px;"></span>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="cfg-yaml-editor" rows="30" style="font-family: monospace; width: 100%;"
+                            placeholder="Full YAML configuration..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label id="cfg-yaml-commit-label">Commit Message</label>
+                        <input type="text" id="cfg-yaml-commit" placeholder="Describe your changes...">
+                    </div>
+                    <button id="cfg-save-yaml-btn" class="btn btn-success" onclick="saveYamlConfig()">💾 Save YAML</button>
+                </div>
+
+                <!-- Version History Tab -->
+                <div id="cfg-versions" class="config-tab-content">
+                    <div style="margin-bottom: 15px;">
+                        <button id="cfg-refresh-versions-btn" class="btn" onclick="loadConfigVersions()">🔄 Refresh Versions</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th id="cfg-version-th">Version</th>
+                                <th id="cfg-time-th">Time</th>
+                                <th id="cfg-message-th">Message</th>
+                                <th id="cfg-actions-th">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="config-versions-list">
+                            <tr class="skeleton-row">
+                                <td><span class="skeleton skeleton-inline" style="width: 80px;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 150px;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 200px;"></span></td>
+                                <td><span class="skeleton skeleton-btn"></span></td>
+                            </tr>
+                            <tr class="skeleton-row">
+                                <td><span class="skeleton skeleton-inline" style="width: 80px;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 150px;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 200px;"></span></td>
+                                <td><span class="skeleton skeleton-btn"></span></td>
+                            </tr>
+                            <tr class="skeleton-row">
+                                <td><span class="skeleton skeleton-inline" style="width: 80px;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 150px;"></span></td>
+                                <td><span class="skeleton skeleton-inline" style="width: 200px;"></span></td>
+                                <td><span class="skeleton skeleton-btn"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="config-diff-container" style="display: none; margin-top: 20px;">
+                        <h3 id="cfg-version-diff-title">Version Diff</h3>
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <select id="diff-from"></select>
+                            <span id="cfg-diff-arrow">→</span>
+                            <select id="diff-to"></select>
+                            <button id="cfg-compare-btn" class="btn" onclick="showSelectedDiff()">Compare</button>
+                        </div>
+                        <div id="config-diff-content" style="max-height: 400px; overflow: auto; font-family: monospace;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button id="cfg-apply-btn" class="btn btn-primary" onclick="applyConfig()">🚀 Apply Config & Restart Oxidized</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Group Modal -->
+    <div id="groupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="group-modal-title">Add Group</h2>
+            </div>
+            <form onsubmit="saveGroup(event)">
+                <input type="hidden" id="editGroupId">
+                <div class="form-group">
+                    <label id="grp-name-label">Group Name</label>
+                    <input type="text" id="groupName" required>
+                </div>
+                <div class="form-group">
+                    <label id="grp-desc-label">Description</label>
+                    <textarea id="groupDescription" rows="3" placeholder="Optional description"></textarea>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-success" style="flex: 1;" id="grp-save-btn">Save</button>
+                    <button type="button" class="btn" onclick="closeGroupModal()" style="flex: 1;" id="grp-cancel-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 修改密码模态框 -->
+    <div id="changePasswordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="change-pwd-title">Change Password</h2>
+                
+            </div>
+            <form onsubmit="handleChangePassword(event)">
+                <div class="form-group">
+                    <label id="change-pwd-label-current">Current Password</label>
+                    <div class="password-input-group">
+                        <input type="password" id="changePasswordCurrent" required>
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('changePasswordCurrent')">👁️</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label id="change-pwd-label-new">New Password</label>
+                    <div class="password-input-group">
+                        <input type="password" id="changePasswordNew" required>
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('changePasswordNew')">👁️</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label id="change-pwd-label-confirm">Confirm New Password</label>
+                    <div class="password-input-group">
+                        <input type="password" id="changePasswordConfirm" required>
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('changePasswordConfirm')">👁️</button>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-success" id="btn-change-pwd" style="flex: 1;">Save</button>
+                    <button type="button" class="btn" onclick="closeChangePasswordModal()" id="btn-cancel-pwd" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 编辑节点模态框 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="edit-title">Edit Node</h2>
+            </div>
+            <form onsubmit="updateNode(event)">
+                <div class="form-group">
+                    <label id="edit-label-name">Node Name</label>
+                    <input type="text" id="editNodeName" readonly style="background: #f5f5f5;">
+                </div>
+                <div class="form-group">
+                    <label id="edit-label-ip">IP Address</label>
+                    <input type="text" id="editNodeIp" required>
+                </div>
+                <div class="form-group">
+                    <label id="edit-label-model">Device Model</label>
+                    <select id="editNodeModel" required>
+                        <option value="">Select device model</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="edit-label-protocol">Protocol</label>
+                    <select id="editNodeProtocol" required onchange="updateEditNodePort()">
+                        <option value="ssh">SSH</option>
+                        <option value="telnet">Telnet</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="edit-label-group">Group</label>
+                    <select id="editNodeGroup">
+                        <option value="">No Group</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="edit-label-port">Port</label>
+                    <input type="number" id="editNodePort" min="1" max="65535" required>
+                </div>
+                <div class="form-group">
+                    <label id="edit-label-credential">Credential</label>
+                    <select id="editNodeCredential" onchange="onEditCredentialChange()">
+                        <option value="">Select credential</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label id="edit-label-username">Username</label>
+                    <input type="text" id="editNodeUsername">
+                </div>
+                <div class="form-group">
+                    <label id="edit-label-password">Password</label>
+                    <div class="password-input-group">
+                        <input type="password" id="editNodePassword">
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('editNodePassword')">👁️</button>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-success" id="btn-save" style="flex: 1;">Save</button>
+                    <button type="button" class="btn" onclick="closeEditModal()" id="btn-cancel" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 用户修改密码模态框 -->
+    <div id="userChangePasswordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="user-change-pwd-title">Change Password</h2>
+                
+            </div>
+            <div id="userChangePasswordAlert" class="alert"></div>
+            <form onsubmit="handleUserChangePassword(event)">
+                <div class="form-group">
+                    <label id="user-change-pwd-label-username">Username</label>
+                    <input type="text" id="userChangePasswordUsername" readonly style="background: #f5f5f5;">
+                </div>
+                <div class="form-group">
+                    <label id="user-change-pwd-label-new">New Password</label>
+                    <div class="password-input-group">
+                        <input type="password" id="userChangePasswordNew" required>
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('userChangePasswordNew')">👁️</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label id="user-change-pwd-label-confirm">Confirm New Password</label>
+                    <div class="password-input-group">
+                        <input type="password" id="userChangePasswordConfirm" required>
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('userChangePasswordConfirm')">👁️</button>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-success" id="btn-user-change-pwd" style="flex: 1;">Save</button>
+                    <button type="button" class="btn" onclick="closeUserChangePasswordModal()" id="btn-cancel-user-pwd" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+        <!-- 添加用户模态框 -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="add-user-title">Add User</h2>
+                
+            </div>
+            <form onsubmit="handleAddUser(event)">
+                <div class="form-group">
+                    <label id="add-user-label-name">Username</label>
+                    <input type="text" id="addUserUsername" required>
+                </div>
+                <div class="form-group">
+                    <label id="add-user-label-password">Password</label>
+                    <div class="password-input-group">
+                        <input type="password" id="addUserPassword" required>
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('addUserPassword')">👁️</button>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-success" id="btn-add-user-confirm" style="flex: 1;">Add</button>
+                    <button type="button" class="btn" onclick="closeAddUserModal()" id="btn-cancel-user" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 添加凭证模态框 -->
+    <div id="addCredentialModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="add-cred-title">Add Credential</h2>
+                
+            </div>
+            <form onsubmit="handleAddCredential(event)">
+                <div class="form-group">
+                    <label id="add-cred-label-id">Credential ID</label>
+                    <input type="text" id="addCredId" placeholder="e.g., huawei-admin">
+                </div>
+                <div class="form-group">
+                    <label id="add-cred-label-name">Label</label>
+                    <input type="text" id="addCredLabel" placeholder="e.g., Huawei Admin" required>
+                </div>
+                <div class="form-group">
+                    <label id="add-cred-label-username">Username</label>
+                    <input type="text" id="addCredUsername" required>
+                </div>
+                <div class="form-group">
+                    <label id="add-cred-label-password">Password</label>
+                    <div class="password-input-group">
+                        <input type="password" id="addCredPassword" required>
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('addCredPassword')">👁️</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label id="add-cred-label-enable">Enable Password (Optional)</label>
+                    <div class="password-input-group">
+                        <input type="password" id="addCredEnablePassword" placeholder="Leave empty if not needed">
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('addCredEnablePassword')">👁️</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label id="add-cred-label-desc">Description</label>
+                    <input type="text" id="addCredDescription" placeholder="e.g., Huawei device admin account">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-success" id="btn-add-cred-confirm" style="flex: 1;">Add</button>
+                    <button type="button" class="btn" onclick="closeAddCredentialModal()" id="btn-cancel-cred" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 编辑凭证模态框 -->
+    <div id="editCredentialModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="edit-cred-title">Edit Credential</h2>
+                
+            </div>
+            <form onsubmit="handleUpdateCredential(event)">
+                <input type="hidden" id="editCredId">
+                <div class="form-group">
+                    <label id="edit-cred-label-name">Label</label>
+                    <input type="text" id="editCredLabel" required>
+                </div>
+                <div class="form-group">
+                    <label id="edit-cred-label-username">Username</label>
+                    <input type="text" id="editCredUsername" required>
+                </div>
+                <div class="form-group">
+                    <label id="edit-cred-label-password">Password</label>
+                    <div class="password-input-group">
+                        <input type="password" id="editCredPassword" required>
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('editCredPassword')">👁️</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label id="edit-cred-label-enable">Enable Password (Optional)</label>
+                    <div class="password-input-group">
+                        <input type="password" id="editCredEnablePassword" placeholder="Leave empty if not needed">
+                        <button type="button" class="password-toggle" onclick="togglePasswordVisibility('editCredEnablePassword')">👁️</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label id="edit-cred-label-desc">Description</label>
+                    <input type="text" id="editCredDescription">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-success" id="btn-edit-cred-confirm" style="flex: 1;">Save</button>
+                    <button type="button" class="btn" onclick="closeEditCredentialModal()" id="btn-cancel-cred-edit" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Config Modal -->
+    <div id="viewConfigModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 id="view-config-title">View Configuration</h2>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <span id="view-config-node-name" style="font-weight: bold;"></span>
+            </div>
+            <div style="background: #f5f5f5; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+                <span id="view-config-status"></span>
+            </div>
+            <div style="max-height: 400px; overflow-y: auto;">
+                <textarea id="viewConfigContent" readonly style="height: 400px; width: 100%; font-family: monospace; font-size: 12px; box-sizing: border-box;"></textarea>
+            </div>
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                <button class="btn" onclick="copyConfig()" id="btn-copy-config">📋 Copy Config</button>
+                <button class="btn" onclick="closeViewConfigModal()" id="btn-close-config">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Version History Modal -->
+    <div id="versionHistoryModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2 id="version-history-title">Version History</h2>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <span id="version-history-node-name" style="font-weight: bold;"></span>
+            </div>
+            <div id="versionHistoryList" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 10px;">
+                <div class="skeleton-row"><span class="skeleton skeleton-inline" style="width: 250px;"></span></div>
+                <div class="skeleton-row"><span class="skeleton skeleton-inline" style="width: 250px;"></span></div>
+                <div class="skeleton-row"><span class="skeleton skeleton-inline" style="width: 250px;"></span></div>
+            </div>
+            <div style="margin-top: 15px;">
+                <h4 id="version-detail-title">Version Details</h4>
+                <div id="versionDetailContent" style="background: #f5f5f5; padding: 10px; border-radius: 4px; max-height: 300px; overflow-y: auto;">
+                    Select a version to view details
+                </div>
+            </div>
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                <button class="btn" onclick="compareVersions()" id="btn-compare-versions">Compare Selected</button>
+                <button class="btn" onclick="closeVersionHistoryModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Diff Modal - Split Pane Version Compare -->
+    <div id="diffModal" class="modal">
+        <div id="diffModalContent" class="modal-content" style="max-width: 1600px; width: 98vw; height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-header" style="flex-shrink: 0; display: flex; align-items: center; gap: 15px;">
+                <h2 id="diff-title">Compare Versions</h2>
+                <div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
+                    <button id="btn-toggle-mode" class="btn" onclick="toggleDiffMode()" style="padding: 5px 12px; font-size: 11px;">Show: All</button>
+                </div>
+            </div>
+            <div style="margin-bottom: 12px; flex-shrink: 0; display: flex; align-items: center; gap: 20px;">
+                <span id="diff-node-name" style="font-weight: bold;"></span>
+                <span id="diff-versions" style="color: #666;"></span>
+                <div style="margin-left: auto; display: flex; gap: 15px; font-size: 12px;">
+                    <span style="background: #2d2d2d; color: #fff; padding: 2px 10px; border-radius: 3px;">Old (Left)</span>
+                    <span style="background: #1a1a1a; color: #fff; padding: 2px 10px; border-radius: 3px;">New (Right)</span>
+                </div>
+            </div>
+            <!-- Split pane diff container -->
+            <div id="diffPaneContainer" style="flex: 1; display: flex; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; min-height: 0;">
+                <!-- Old version (left pane) -->
+                <div style="flex: 1; display: flex; flex-direction: column; border-right: 1px solid #ddd; background: #fafafa; overflow: hidden;">
+                    <div style="padding: 8px 12px; background: #2d2d2d; color: #fff; font-size: 12px; font-weight: 500; display: flex; justify-content: space-between;">
+                <span id="diff-old-version-label">Old Version</span>
+                        <span id="diff-old-count"></span>
+                    </div>
+                    <div id="diff-old-content" style="flex: 1; overflow: auto; font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace; font-size: 12px; line-height: 1.5;" onscroll="syncScroll(this, 'diff-new-content')">
+                    </div>
+                </div>
+                <!-- New version (right pane) -->
+                <div style="flex: 1; display: flex; flex-direction: column; background: #fff; overflow: hidden;">
+                    <div style="padding: 8px 12px; background: #1a1a1a; color: #fff; font-size: 12px; font-weight: 500; display: flex; justify-content: space-between;">
+                <span id="diff-new-version-label">New Version</span>
+                        <span id="diff-new-count"></span>
+                    </div>
+                    <div id="diff-new-content" style="flex: 1; overflow: auto; font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace; font-size: 12px; line-height: 1.5;" onscroll="syncScroll(this, 'diff-old-content')">
+                    </div>
+                </div>
+            </div>
+            <!-- Legend -->
+            <div style="margin-top: 12px; flex-shrink: 0; display: flex; gap: 20px; font-size: 12px; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <div style="width: 16px; height: 16px; background: #c8e6c9; border: 1px solid #81c784;"></div>
+                    <span>Added</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <div style="width: 16px; height: 16px; background: #ffcdd2; border: 1px solid #e57373;"></div>
+                    <span>Removed</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <div style="width: 16px; height: 16px; background: #fff9c4; border: 1px solid #ffd54f;"></div>
+                    <span>Modified</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <div style="width: 16px; height: 16px; background: #e0e0e0; border: 1px solid #bbb;"></div>
+                    <span>Unchanged</span>
+                </div>
+                <div style="margin-left: auto;">
+                    <button class="btn" onclick="closeDiffModal()" style="padding: 6px 16px;">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backup Interval Settings Modal -->
+    <div id="backupIntervalModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="backup-interval-title">Backup Interval Settings</h2>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <p style="color: #666; font-size: 14px;">Configure how often Oxidized backs up all network devices. The interval is global and applies to all nodes.</p>
+            </div>
+            <form onsubmit="saveBackupInterval(event)">
+                <div class="form-group">
+                    <label id="backup-interval-label">Backup Interval (minutes)</label>
+                    <input type="number" id="backupIntervalMinutes" min="1" max="10080" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                    <div style="font-size: 12px; color: #999; margin-top: 5px;">Range: 1 minute to 10080 minutes (7 days). Default: 60 minutes.</div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-success" id="btn-save-interval" style="flex: 1;">Save</button>
+                    <button type="button" class="btn" onclick="closeBackupIntervalModal()" id="btn-cancel-interval" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+</div>
+
+    
+<script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

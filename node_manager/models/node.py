@@ -18,6 +18,8 @@ class Node:
         port: int = 22,
         username: str = "",
         password: str = "",
+        group_id: Optional[int] = None,
+        group_name: Optional[str] = None,
         last_backup: Optional[str] = None,
         last_status: str = "pending",
         id: Optional[int] = None,
@@ -32,6 +34,8 @@ class Node:
         self.port = port
         self.username = username
         self.password = password
+        self.group_id = group_id
+        self.group_name = group_name
         self.last_backup = last_backup
         self.last_status = last_status
         self.created_at = created_at
@@ -48,6 +52,8 @@ class Node:
             "port": self.port,
             "username": self.username,
             "password": self.password,
+            "group_id": self.group_id,
+            "group_name": self.group_name,
             "last_backup": self.last_backup,
             "last_status": self.last_status,
             "created_at": self.created_at,
@@ -71,6 +77,8 @@ class Node:
             port=data.get("port", 22),
             username=data.get("username", ""),
             password=data.get("password", ""),
+            group_id=data.get("group_id"),
+            group_name=data.get("group_name"),
             last_backup=data.get("last_backup"),
             last_status=data.get("last_status", "pending"),
             created_at=data.get("created_at"),
@@ -79,9 +87,14 @@ class Node:
 
     @classmethod
     def get_all(cls) -> List["Node"]:
-        """Get all nodes."""
+        """Get all nodes with group names."""
         with get_db_cursor() as cursor:
-            cursor.execute("SELECT * FROM nodes ORDER BY name")
+            cursor.execute("""
+                SELECT n.*, g.name as group_name
+                FROM nodes n
+                LEFT JOIN groups g ON n.group_id = g.id
+                ORDER BY n.name
+            """)
             return [cls.from_row(row) for row in cursor.fetchall()]
 
     @classmethod
@@ -107,8 +120,8 @@ class Node:
                 # Insert new node
                 cursor.execute(
                     """
-                    INSERT INTO nodes (name, ip, model, protocol, port, username, password, last_backup, last_status)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    INSERT INTO nodes (name, ip, model, protocol, port, username, password, last_backup, last_status, group_id)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                     (
                         self.name,
@@ -120,6 +133,7 @@ class Node:
                         self.password,
                         self.last_backup,
                         self.last_status,
+                        self.group_id,
                     ),
                 )
                 self.id = cursor.lastrowid
@@ -129,7 +143,7 @@ class Node:
                     """
                     UPDATE nodes SET
                         name=?, ip=?, model=?, protocol=?, port=?,
-                        username=?, password=?, last_backup=?, last_status=?,
+                        username=?, password=?, last_backup=?, last_status=?, group_id=?,
                         updated_at=datetime('now')
                     WHERE id=?
                 """,
@@ -143,6 +157,7 @@ class Node:
                         self.password,
                         self.last_backup,
                         self.last_status,
+                        self.group_id,
                         self.id,
                     ),
                 )
@@ -204,4 +219,17 @@ class Node:
             cursor.execute(
                 "SELECT * FROM nodes WHERE last_status=? ORDER BY name", (status,)
             )
+            return [cls.from_row(row) for row in cursor.fetchall()]
+
+    @classmethod
+    def get_by_group(cls, group_id: int) -> List["Node"]:
+        """Get nodes belonging to a specific group."""
+        with get_db_cursor() as cursor:
+            cursor.execute("""
+                SELECT n.*, g.name as group_name
+                FROM nodes n
+                LEFT JOIN groups g ON n.group_id = g.id
+                WHERE n.group_id = ?
+                ORDER BY n.name
+            """, (group_id,))
             return [cls.from_row(row) for row in cursor.fetchall()]
