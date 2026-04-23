@@ -39,9 +39,9 @@ Network device configuration backup management system, built on Oxidized, provid
 
 ### v1.2.1 (2026-04-23) 🔒 Security Fix
 
-> Fixed GitHub Code Scanning alerts - 18 instances of `py/stack-trace-exposure` vulnerability.
+> Fixed 18 instances of `py/stack-trace-exposure` vulnerability (CWE-209/CWE-497).
 
-- **API Error Information Exposure Fix** - Replaced `str(e)` in API error handlers with generic error messages (`"Internal server error"` / `"Failed to create user"`). Fixes CWE-209/CWE-497. Files: `config_api.py` (11), `auth.py` (2), `nodes.py` (2), `groups_api.py` (3).
+- **API Error Information Exposure Fix** - Replaced `str(e)` in API error handlers with generic error messages (`"Internal server error"` / `"Failed to create user"`). Files: `config_api.py` (11), `auth.py` (2), `nodes.py` (2), `groups_api.py` (3).
 
 ### v1.0.0 (2026-01-10)
 
