@@ -42,7 +42,7 @@ def delete_oxidized_node(node_name):
         return {"success": False, "error": f"HTTP {response.status_code}"}
     except Exception as e:
         print(f"Error deleting Oxidized node {node_name}: {e}")
-        return {"success": False, "error": str(e)}
+        return {"success": False, "error": "Internal server error"}
 
 
 def write_nodes_csv(nodes):
@@ -237,4 +237,4 @@ def import_nodes():
 
         return jsonify({"success": True, "count": len(new_nodes)})
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
+        return jsonify({"success": False, "error": "Internal server error"})

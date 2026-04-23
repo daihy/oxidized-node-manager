@@ -29,7 +29,7 @@ def get_config():
             "yaml_content": current_yaml,
         })
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Internal server error"}), 500
 
 
 @config_bp.route("/api/config/menu", methods=["PUT"])
@@ -61,7 +61,7 @@ def save_menu_config():
             return jsonify({"success": True})
         return jsonify({"success": False, "error": "Failed to write config"}), 500
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"success": False, "error": "Internal server error"}), 500
 
 
 @config_bp.route("/api/config/yaml", methods=["PUT"])
@@ -90,7 +90,7 @@ def save_yaml_config():
             return jsonify({"success": True})
         return jsonify({"success": False, "error": "Failed to write config"}), 500
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"success": False, "error": "Internal server error"}), 500
 
 
 @config_bp.route("/api/config/versions", methods=["GET"])
@@ -134,7 +134,7 @@ def get_config_versions():
             "limit": limit,
         })
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Internal server error"}), 500
 
 
 @config_bp.route("/api/config/diff", methods=["GET"])
@@ -220,7 +220,7 @@ def get_config_diff():
             "diff_lines": diff_lines,
         })
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Internal server error"}), 500
 
 
 @config_bp.route("/api/config/rollback", methods=["POST"])
@@ -256,7 +256,7 @@ def rollback_config():
             return jsonify({"success": True, "new_version": target_version})
         return jsonify({"success": False, "error": "Failed to write config"}), 500
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"success": False, "error": "Internal server error"}), 500
 
 
 @config_bp.route("/api/config/validate", methods=["POST"])
@@ -268,7 +268,7 @@ def validate_config():
         validation = validate_yaml(yaml_content)
         return jsonify(validation)
     except Exception as e:
-        return jsonify({"valid": False, "errors": [str(e)]}), 500
+        return jsonify({"valid": False, "errors": ["Internal server error"]}), 500
 
 
 @config_bp.route("/api/config/apply", methods=["POST"])
@@ -287,7 +287,7 @@ def apply_config():
             "oxidized_restarted": restart,
         })
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+        return jsonify({"success": False, "error": "Internal server error"}), 500
 
 
 def _save_version(config_content: str, commit_message: str, created_by: str = "admin"):

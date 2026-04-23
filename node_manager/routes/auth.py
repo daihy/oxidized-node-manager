@@ -110,7 +110,7 @@ def setup():
         session["username"] = user.username
         return jsonify({"success": True})
     except Exception as e:
-        return jsonify({"success": False, "error": f"创建用户失败: {str(e)}"})
+        return jsonify({"success": False, "error": "Failed to create user"})
 
 
 @auth_bp.route("/api/check-setup-status", methods=["GET"])
@@ -211,7 +211,7 @@ def users_api():
             User.create_user(username=username, password=password, role=role)
             return jsonify({"success": True})
         except Exception as e:
-            return jsonify({"success": False, "error": f"创建用户失败: {str(e)}"})
+            return jsonify({"success": False, "error": "Failed to create user"})
 
 
 @auth_bp.route("/api/users/<username>", methods=["DELETE"])
