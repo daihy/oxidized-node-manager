@@ -64,6 +64,19 @@
 
 ---
 
+## v1.2.1 (2026-04-23) 🔒 安全修复 / 🔒 Security Fix
+
+> **修复 GitHub Code Scanning 告警** - 共修复 18 处 `py/stack-trace-exposure` 漏洞。
+> **Fixed GitHub Code Scanning Alerts** - Fixed 18 instances of `py/stack-trace-exposure` vulnerability.
+
+### 🔒 安全修复 / Security Fixes
+
+| 中文 | English |
+|------|---------|
+| **修复 API 错误信息泄露** - 替换所有 `except Exception as e: return ... str(e)` 为通用错误消息 `"Internal server error"` 或 `"Failed to create user"`，防止异常堆栈信息暴露给 API 客户端。修复 CWE-209/CWE-497（通过错误消息的信息泄露）。涉及文件：`config_api.py`（11处）、`auth.py`（2处）、`nodes.py`（2处）、`groups_api.py`（3处）。 | **Fixed API Error Information Exposure** - Replaced all `except Exception as e: return ... str(e)` with generic error messages `"Internal server error"` or `"Failed to create user"`, preventing exception stack traces from being exposed to API clients. Fixes CWE-209/CWE-497 (Information exposure through error messages). Files affected: `config_api.py` (11 instances), `auth.py` (2 instances), `nodes.py` (2 instances), `groups_api.py` (3 instances). |
+
+---
+
 ## v1.0.0 (2026-01-10)
 
 | 中文 | English |

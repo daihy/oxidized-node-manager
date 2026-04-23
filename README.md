@@ -54,6 +54,15 @@
 | **Nginx 配置增强** - `nginx-proxy.conf` 新增 gzip 压缩（gzip_types: text/plain text/css application/json application/javascript text/xml application/xml） | **Nginx Config Enhancement** - `nginx-proxy.conf` added gzip compression (gzip_types: text/plain text/css application/json application/javascript text/xml application/xml) |
 | **README 文档升级** - 所有 README 文件添加完整更新日志，标注重大升级版本 | **README Documentation Upgrade** - All README files updated with full changelog and major upgrade markers |
 
+### v1.2.1 (2026-04-23) 🔒 安全修复 / 🔒 Security Fix
+
+> **修复 GitHub Code Scanning 告警** - 共修复 18 处 `py/stack-trace-exposure` 漏洞。
+> **Fixed GitHub Code Scanning Alerts** - Fixed 18 instances of `py/stack-trace-exposure` vulnerability.
+
+| 中文 | English |
+|------|---------|
+| **修复 API 错误信息泄露** - 替换所有 `except Exception as e: return ... str(e)` 为通用错误消息，防止异常堆栈暴露给 API 客户端。修复 CWE-209/CWE-497。涉及：`config_api.py`（11处）、`auth.py`（2处）、`nodes.py`（2处）、`groups_api.py`（3处）。 | **Fixed API Error Information Exposure** - Replaced all `str(e)` in API error handlers with generic messages (`"Internal server error"` / `"Failed to create user"`). Fixes CWE-209/CWE-497. Files: `config_api.py` (11), `auth.py` (2), `nodes.py` (2), `groups_api.py` (3). |
+
 ### v1.0.0 (2026-01-10)
 
 | 中文 | English |

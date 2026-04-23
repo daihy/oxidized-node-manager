@@ -37,6 +37,12 @@
 - `nginx-proxy.conf` 新增 gzip 压缩
 - 所有 README 文件添加完整更新日志
 
+### v1.2.1 (2026-04-23) 🔒 安全修复
+
+> 修复 GitHub Code Scanning 告警 - 18 处 `py/stack-trace-exposure` 漏洞。
+
+- **API 错误信息泄露修复** - 替换所有 `str(e)` 为通用错误消息（`"Internal server error"` / `"Failed to create user"`）。修复 CWE-209/CWE-497。涉及：`config_api.py`（11处）、`auth.py`（2处）、`nodes.py`（2处）、`groups_api.py`（3处）。
+
 ### v1.0.0 (2026-01-10)
 
 - 初始版本发布
