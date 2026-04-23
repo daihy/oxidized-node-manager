@@ -56,12 +56,15 @@
 
 ### v1.2.1 (2026-04-23) 🔒 安全修复 / 🔒 Security Fix
 
-> **修复 GitHub Code Scanning 告警** - 共修复 18 处 `py/stack-trace-exposure` 漏洞。
-> **Fixed GitHub Code Scanning Alerts** - Fixed 18 instances of `py/stack-trace-exposure` vulnerability.
+> **修复 GitHub Code Scanning 告警** - 共修复 21 处 `py/stack-trace-exposure` + 1 处 `py/clear-text-logging-sensitive-data` 漏洞。Alert #21 (`py/clear-text-storage-sensitive-data`) 为 Oxidized 设计决策，永久标记为 wontfix，详见 `SECURITY.md`。
+> **Fixed GitHub Code Scanning Alerts** - Fixed 21 instances of `py/stack-trace-exposure` and 1 instance of `py/clear-text-logging-sensitive-data`. Alert #21 (`py/clear-text-storage-sensitive-data`) is an Oxidized design decision, permanently marked as wontfix — see `SECURITY.md`.
 
 | 中文 | English |
 |------|---------|
-| **修复 API 错误信息泄露（CWE-209/CWE-497）** - 替换所有 `except Exception as e: return ... str(e)` 为通用错误消息，防止异常堆栈暴露给 API 客户端。涉及：`config_api.py`（11处）、`auth.py`（2处）、`nodes.py`（2处）、`groups_api.py`（3处）。 | **Fixed API Error Information Exposure (CWE-209/CWE-497)** - Replaced all `str(e)` in API error handlers with generic error messages. Prevents exception stack traces from API clients. Files: `config_api.py` (11), `auth.py` (2), `nodes.py` (2), `groups_api.py` (3). |
+| **修复 API 错误信息泄露（CWE-209/CWE-497）— 第一批** - 替换所有 `except Exception as e: return ... str(e)` 为通用错误消息，防止异常堆栈暴露给 API 客户端。涉及：`config_api.py`（11处）、`auth.py`（2处）、`nodes.py`（2处）、`groups_api.py`（3处）。 | **Fixed API Error Information Exposure (CWE-209/CWE-497) — Batch 1** - Replaced all `str(e)` in API error handlers with generic messages. Files: `config_api.py` (11), `auth.py` (2), `nodes.py` (2), `groups_api.py` (3). |
+| **修复 API 错误信息泄露（CWE-209/CWE-497）— 第二批** - 移除 `except Exception as e:` 中的 `as e` 子句；替换 `result["error"]` 为 `"Backup failed"`（`oxidized_api.py`）；替换 `str(e)` 为 `"Backup request failed"`（`oxidized_service.py`）；移除 `print(password)` 明文日志（`database.py`）。 | **Fixed API Error Information Exposure (CWE-209/CWE-497) — Batch 2** - Removed `as e` from `except Exception as e:`; replaced `result["error"]` with `"Backup failed"` (`oxidized_api.py`); replaced `str(e)` with `"Backup request failed"` (`oxidized_service.py`); removed `print(password)` logging (`database.py`). |
+| **修复 YAML 错误信息泄露** - `validate_yaml()` 的 `errors` 字段返回 `str(yaml_error)` 暴露 YAML 解析细节，现改为 `"Invalid YAML configuration"`（`config_service.py`）。 | **Fixed YAML Error Detail Exposure** - `validate_yaml()` was returning `str(yaml_error)` in the `errors` field, exposing YAML parser details. Now returns generic `"Invalid YAML configuration"` (`config_service.py`). |
+| **Alert #21 wontfix** - `py/clear-text-storage-sensitive-data` 为 Oxidized 设计决策，详见 `SECURITY.md`。 | **Alert #21 Wontfix** - `py/clear-text-storage-sensitive-data` is an Oxidized design decision. See `SECURITY.md`. |
 
 ### v1.0.0 (2026-01-10)
 

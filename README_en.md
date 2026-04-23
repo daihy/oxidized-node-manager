@@ -39,9 +39,12 @@ Network device configuration backup management system, built on Oxidized, provid
 
 ### v1.2.1 (2026-04-23) 🔒 Security Fix
 
-> Fixed 18 instances of `py/stack-trace-exposure` vulnerability (CWE-209/CWE-497).
+> Fixed 21 instances of `py/stack-trace-exposure` and 1 instance of `py/clear-text-logging-sensitive-data`. Alert #21 (`py/clear-text-storage-sensitive-data`) is an Oxidized design decision — permanently wontfix. See `SECURITY.md`.
 
-- **API Error Information Exposure Fix** - Replaced `str(e)` in API error handlers with generic error messages (`"Internal server error"` / `"Failed to create user"`). Files: `config_api.py` (11), `auth.py` (2), `nodes.py` (2), `groups_api.py` (3).
+- **API Error Information Exposure Fix (Batch 1)** - Replaced `str(e)` in API error handlers with generic messages. Files: `config_api.py` (11), `auth.py` (2), `nodes.py` (2), `groups_api.py` (3).
+- **API Error Information Exposure Fix (Batch 2)** - Removed `as e` from `except Exception as e:` blocks; replaced `result["error"]` with `"Backup failed"` (`oxidized_api.py`); replaced `str(e)` with `"Backup request failed"` (`oxidized_service.py`); removed `print(password)` plain-text logging (`database.py`).
+- **YAML Error Detail Exposure Fix** - `validate_yaml()` was returning `str(yaml_error)` in the `errors` field. Now returns generic `"Invalid YAML configuration"` (`config_service.py`).
+- **Alert #21 Wontfix** - `py/clear-text-storage-sensitive-data` is by design. Oxidized config must store credentials in plain text for device authentication. See `SECURITY.md`.
 
 ### v1.0.0 (2026-01-10)
 
