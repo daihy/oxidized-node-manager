@@ -186,7 +186,7 @@ def _create_default_admin_user():
             ("admin", password_hash, "admin"),
         )
 
-    print(f"Default admin user created with password: {default_password}")
+    print("Default admin user created. Please change the password after first login!")
     print("IMPORTANT: Please change this password after first login!")
 
 

@@ -33,7 +33,7 @@ def create_group():
         group = Group(name=name, description=description)
         group.save()
         return jsonify({"success": True, "group": group.to_dict()})
-    except Exception as e:
+    except Exception:
         return jsonify({"success": False, "error": "Internal server error"}), 500
 
 
@@ -58,7 +58,7 @@ def update_group(group_id):
     try:
         group.save()
         return jsonify({"success": True, "group": group.to_dict()})
-    except Exception as e:
+    except Exception:
         return jsonify({"success": False, "error": "Internal server error"}), 500
 
 @groups_bp.route("/api/groups/<int:group_id>", methods=["DELETE"])
@@ -75,5 +75,5 @@ def delete_group(group_id):
     try:
         group.delete()
         return jsonify({"success": True})
-    except Exception as e:
+    except Exception:
         return jsonify({"success": False, "error": "Internal server error"}), 500

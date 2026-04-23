@@ -165,7 +165,7 @@ def oxidized_node_backup(node_name):
     """Trigger immediate backup."""
     result = trigger_oxidized_backup(node_name)
     if "error" in result:
-        return jsonify({"success": False, "error": result["error"]}), 500
+        return jsonify({"success": False, "error": "Backup failed"}), 500
     return jsonify({"success": True, "result": result})
 
 

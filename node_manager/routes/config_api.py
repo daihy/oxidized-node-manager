@@ -28,7 +28,7 @@ def get_config():
             "menu_settings": menu_settings,
             "yaml_content": current_yaml,
         })
-    except Exception as e:
+    except Exception:
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -49,7 +49,7 @@ def save_menu_config():
         if not validation["valid"]:
             return jsonify({
                 "success": False,
-                "errors": validation["errors"]
+                "errors": ["Invalid YAML configuration"]
             }), 400
 
         # Save current version to history
@@ -60,7 +60,7 @@ def save_menu_config():
         if write_config(new_yaml):
             return jsonify({"success": True})
         return jsonify({"success": False, "error": "Failed to write config"}), 500
-    except Exception as e:
+    except Exception:
         return jsonify({"success": False, "error": "Internal server error"}), 500
 
 
@@ -78,7 +78,7 @@ def save_yaml_config():
         if not validation["valid"]:
             return jsonify({
                 "success": False,
-                "errors": validation["errors"]
+                "errors": ["Invalid YAML configuration"]
             }), 400
 
         # Save current version to history
@@ -89,7 +89,7 @@ def save_yaml_config():
         if write_config(yaml_content):
             return jsonify({"success": True})
         return jsonify({"success": False, "error": "Failed to write config"}), 500
-    except Exception as e:
+    except Exception:
         return jsonify({"success": False, "error": "Internal server error"}), 500
 
 
@@ -133,7 +133,7 @@ def get_config_versions():
             "page": page,
             "limit": limit,
         })
-    except Exception as e:
+    except Exception:
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -219,7 +219,7 @@ def get_config_diff():
             },
             "diff_lines": diff_lines,
         })
-    except Exception as e:
+    except Exception:
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -255,7 +255,7 @@ def rollback_config():
         if write_config(target_content):
             return jsonify({"success": True, "new_version": target_version})
         return jsonify({"success": False, "error": "Failed to write config"}), 500
-    except Exception as e:
+    except Exception:
         return jsonify({"success": False, "error": "Internal server error"}), 500
 
 
@@ -267,7 +267,7 @@ def validate_config():
         yaml_content = data.get("yaml_content", "")
         validation = validate_yaml(yaml_content)
         return jsonify(validation)
-    except Exception as e:
+    except Exception:
         return jsonify({"valid": False, "errors": ["Internal server error"]}), 500
 
 
@@ -286,7 +286,7 @@ def apply_config():
             "success": True,
             "oxidized_restarted": restart,
         })
-    except Exception as e:
+    except Exception:
         return jsonify({"success": False, "error": "Internal server error"}), 500
 
 
@@ -310,7 +310,7 @@ def _save_version(config_content: str, commit_message: str, created_by: str = "a
                 (version, config_content, config_hash, commit_message, created_by)
                 VALUES (?, ?, ?, ?, ?)
             """, (new_version, config_content, config_hash, commit_message, created_by))
-    except Exception as e:
+    except Exception:
         print(f"Error saving config version: {e}")
 
 
@@ -327,5 +327,5 @@ def init_config_versions():
             current = read_current_config()
             if current:
                 _save_version(current, "Initial configuration", "system")
-    except Exception as e:
+    except Exception:
         print(f"Error initializing config versions: {e}")

@@ -173,7 +173,7 @@ def trigger_oxidized_backup(node_name):
         return {"error": f"HTTP {response.status_code}"}
     except Exception as e:
         print(f"Error triggering Oxidized backup for {node_name}: {e}")
-        return {"error": str(e)}
+        return {"error": "Backup request failed"}
 
 
 def get_oxidized_info():

@@ -26,8 +26,8 @@ def reload_oxidized_nodes():
     try:
         response = requests.get(f"{OXIDIZED_API_URL}/reload.json", timeout=5)
         return response.status_code == 200
-    except Exception as e:
-        print(f"Warning: Failed to reload Oxidized nodes: {e}")
+    except Exception:
+        print("Warning: Failed to reload Oxidized nodes")
         return False
 
 
@@ -40,8 +40,8 @@ def delete_oxidized_node(node_name):
         if response.status_code == 200:
             return {"success": True}
         return {"success": False, "error": f"HTTP {response.status_code}"}
-    except Exception as e:
-        print(f"Error deleting Oxidized node {node_name}: {e}")
+    except Exception:
+        print(f"Error deleting Oxidized node {node_name}")
         return {"success": False, "error": "Internal server error"}
 
 
@@ -236,5 +236,5 @@ def import_nodes():
         reload_oxidized_nodes()
 
         return jsonify({"success": True, "count": len(new_nodes)})
-    except Exception as e:
+    except Exception:
         return jsonify({"success": False, "error": "Internal server error"})

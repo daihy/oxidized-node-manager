@@ -109,7 +109,7 @@ def setup():
         user = User.create_user(username=username, password=password, role="admin")
         session["username"] = user.username
         return jsonify({"success": True})
-    except Exception as e:
+    except Exception:
         return jsonify({"success": False, "error": "Failed to create user"})
 
 
@@ -210,7 +210,7 @@ def users_api():
         try:
             User.create_user(username=username, password=password, role=role)
             return jsonify({"success": True})
-        except Exception as e:
+        except Exception:
             return jsonify({"success": False, "error": "Failed to create user"})
 
 
