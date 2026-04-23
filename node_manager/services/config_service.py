@@ -74,8 +74,8 @@ def validate_yaml(content: str) -> Dict[str, Any]:
     try:
         yaml.safe_load(content)
         return {"valid": True, "errors": []}
-    except yaml.YAMLError as e:
-        return {"valid": False, "errors": [str(e)]}
+    except yaml.YAMLError:
+        return {"valid": False, "errors": ["Invalid YAML configuration"]}
 
 
 def get_menu_settings() -> Dict[str, Any]:
