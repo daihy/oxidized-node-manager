@@ -81,6 +81,21 @@
 
 ---
 
+## v1.2.2 (2026-04-23) 📝 文档修复 / 📝 Documentation Fix
+
+> **文档修复** — 本次更新修复双语项目文档的完整性和同步问题：SECURITY.md 补全中文版本，README_en.md / README_zh.md 项目结构章节与 README.md 同步。
+> **Documentation Fix** — This release fixes bilingual documentation integrity and sync issues: SECURITY.md now has complete Chinese version, README_en.md / README_zh.md project structure sections synced with README.md.
+
+### 📝 文档修复 / Documentation Fixes
+
+| 中文 | English |
+|------|---------|
+| **SECURITY.md 补全中文版本** — 双语项目所有对外文档必须中英双语，原 SECURITY.md 为纯英文，现补全中文版本，Alert #21、风险评估、替代方案全部中英双语对照。 | **SECURITY.md Added Chinese Version** - Bilingual projects require all对外文档 to be Chinese/English bilingual. Original SECURITY.md was English-only; now added complete Chinese version with Alert #21, risk assessment, and alternative solutions in bilingual table format. |
+| **README_en.md 项目结构章节同步** — 新增 v1.2.0 的 `pages.py`、`config_api.py`、`credentials_api.py`、`groups_api.py`、`models_api.py`、`config_service.py`、`group.py`、`static/`、`templates/` 等文件描述。 | **README_en.md Project Structure Synced** - Added missing v1.2.0 files: `pages.py`, `config_api.py`, `credentials_api.py`, `groups_api.py`, `models_api.py`, `config_service.py`, `group.py`, `static/`, `templates/`. |
+| **README_zh.md 项目结构章节同步** — 同上（中文版）。 | **README_zh.md Project Structure Synced** - Same as above (Chinese version). |
+
+---
+
 ## v1.0.0 (2026-01-10)
 
 | 中文 | English |

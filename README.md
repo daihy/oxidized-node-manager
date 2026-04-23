@@ -54,6 +54,16 @@
 | **Nginx 配置增强** - `nginx-proxy.conf` 新增 gzip 压缩（gzip_types: text/plain text/css application/json application/javascript text/xml application/xml） | **Nginx Config Enhancement** - `nginx-proxy.conf` added gzip compression (gzip_types: text/plain text/css application/json application/javascript text/xml application/xml) |
 | **README 文档升级** - 所有 README 文件添加完整更新日志，标注重大升级版本 | **README Documentation Upgrade** - All README files updated with full changelog and major upgrade markers |
 
+### v1.2.2 (2026-04-23) 📝 文档修复 / 📝 Documentation Fix
+
+> **文档修复** — SECURITY.md 补全中文版本，README_en.md / README_zh.md 项目结构章节与 README.md 同步。
+> **Documentation Fix** - SECURITY.md added complete Chinese version; README_en.md / README_zh.md project structure sections synced with README.md.
+
+| 中文 | English |
+|------|---------|
+| **SECURITY.md 补全中文版本** — 双语项目所有对外文档必须中英双语，Alert #21、风险评估、替代方案全部中英对照。 | **SECURITY.md Added Chinese Version** - Bilingual project: all对外文档 must be Chinese/English bilingual. Alert #21, risk assessment, and alternatives now in bilingual table format. |
+| **README_en.md / README_zh.md 项目结构同步** — 新增 v1.2.0 的 `pages.py`、`config_api.py`、`credentials_api.py`、`groups_api.py`、`models_api.py`、`config_service.py`、`static/`、`templates/` 等文件描述。 | **README_en/zh Project Structure Synced** - Added missing v1.2.0 files to project structure sections. |
+
 ### v1.2.1 (2026-04-23) 🔒 安全修复 / 🔒 Security Fix
 
 > **修复 GitHub Code Scanning 告警** - 共修复 21 处 `py/stack-trace-exposure` + 1 处 `py/clear-text-logging-sensitive-data` 漏洞。Alert #21 (`py/clear-text-storage-sensitive-data`) 为 Oxidized 设计决策，永久标记为 wontfix，详见 `SECURITY.md`。

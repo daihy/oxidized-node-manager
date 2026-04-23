@@ -37,6 +37,11 @@
 - `nginx-proxy.conf` 新增 gzip 压缩
 - 所有 README 文件添加完整更新日志
 
+### v1.2.2 (2026-04-23) 📝 文档修复
+
+- **SECURITY.md 补全中文版本** — 双语项目所有对外文档必须中英双语，Alert #21、风险评估、替代方案全部中英对照。
+- **README_en/zh 项目结构同步** — 新增 v1.2.0 的 `pages.py`、`config_api.py`、`credentials_api.py`、`groups_api.py`、`models_api.py`、`config_service.py`、`static/`、`templates/` 等文件描述。
+
 ### v1.2.1 (2026-04-23) 🔒 安全修复
 
 > 修复 21 处 `py/stack-trace-exposure` + 1 处 `py/clear-text-logging-sensitive-data` 漏洞。Alert #21（`py/clear-text-storage-sensitive-data`）为 Oxidized 设计决策，永久标记为 wontfix，详见 `SECURITY.md`。
@@ -96,7 +101,7 @@
 ```
 oxidized-node-manager/
 ├── docker-compose-oxidized.yml   # Docker Compose 配置
-├── nginx-proxy.conf              # Nginx 反向代理配置
+├── nginx-proxy.conf              # Nginx 反向代理配置（含 gzip）
 ├── package_deploy.sh            # 一键部署脚本
 ├── .env.template                # 环境变量模板
 │
@@ -106,14 +111,33 @@ oxidized-node-manager/
 │   ├── config.py                # 配置模块
 │   ├── models/                  # 数据模型
 │   │   ├── node.py             # 节点模型
-│   │   └── user.py             # 用户模型（bcrypt 认证）
+│   │   ├── user.py             # 用户模型（bcrypt 认证）
+│   │   └── group.py            # 设备分组模型（v1.2.0 新增）
 │   ├── routes/                  # Flask 蓝图
 │   │   ├── auth.py             # 认证与用户管理
 │   │   ├── nodes.py            # 节点 CRUD 操作
-│   │   └── oxidized_api.py     # Oxidized API 集成
+│   │   ├── oxidized_api.py     # Oxidized API 集成
+│   │   ├── pages.py            # 页面路由蓝图（v1.2.0 新增）
+│   │   ├── config_api.py       # Oxidized 配置 API（v1.2.0 新增）
+│   │   ├── credentials_api.py  # 设备凭证 API（v1.2.0 新增）
+│   │   ├── groups_api.py       # 设备分组 API（v1.2.0 新增）
+│   │   └── models_api.py       # 设备型号 API（v1.2.0 新增）
 │   ├── services/                # 业务逻辑服务
 │   │   ├── docker_service.py   # Docker 容器操作
-│   │   └── oxidized_service.py # Oxidized API 客户端
+│   │   ├── oxidized_service.py # Oxidized API 客户端
+│   │   └── config_service.py  # Oxidized 配置服务（v1.2.0 新增）
+│   ├── static/                  # 静态资源（v1.2.0 重构）
+│   │   ├── css/
+│   │   │   ├── dashboard.css
+│   │   │   ├── login.css
+│   │   │   └── force_change_password.css
+│   │   └── js/
+│   │       ├── dashboard.js     # Dashboard 逻辑（v1.2.0 新增）
+│   │       └── i18n.js          # 国际化支持（v1.2.0 新增）
+│   ├── templates/               # HTML 模板（v1.2.0 重构）
+│   │   ├── dashboard.html
+│   │   ├── login.html
+│   │   └── force_change_password.html
 │   └── tests/                   # 单元测试（pytest）
 │
 └── oxidized-config/             # Oxidized 配置

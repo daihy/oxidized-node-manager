@@ -37,6 +37,11 @@ Network device configuration backup management system, built on Oxidized, provid
 - `nginx-proxy.conf` gzip compression enabled
 - All README files updated with full changelog
 
+### v1.2.2 (2026-04-23) 📝 Documentation Fix
+
+- **SECURITY.md Added Chinese Version** - Bilingual project: all对外文档 must be Chinese/English bilingual. Alert #21, risk assessment, and alternatives now in bilingual table format.
+- **README_en/zh Project Structure Synced** - Added missing v1.2.0 files to project structure sections.
+
 ### v1.2.1 (2026-04-23) 🔒 Security Fix
 
 > Fixed 21 instances of `py/stack-trace-exposure` and 1 instance of `py/clear-text-logging-sensitive-data`. Alert #21 (`py/clear-text-storage-sensitive-data`) is an Oxidized design decision — permanently wontfix. See `SECURITY.md`.
@@ -96,24 +101,43 @@ Network device configuration backup management system, built on Oxidized, provid
 ```
 oxidized-node-manager/
 ├── docker-compose-oxidized.yml   # Docker Compose configuration
-├── nginx-proxy.conf              # Nginx reverse proxy configuration
+├── nginx-proxy.conf              # Nginx reverse proxy configuration (with gzip)
 ├── package_deploy.sh            # One-click deployment script
 ├── .env.template                # Environment variables template
-│   │
+│
 ├── node_manager/                # Flask Web Application
 │   ├── app.py                   # Main application entry
 │   ├── database.py              # SQLite database operations
 │   ├── config.py                # Configuration module
 │   ├── models/                  # Data models
 │   │   ├── node.py             # Node model
-│   │   └── user.py             # User model with bcrypt auth
+│   │   ├── user.py             # User model (bcrypt auth)
+│   │   └── group.py            # Device group model (v1.2.0 new)
 │   ├── routes/                  # Flask blueprints
 │   │   ├── auth.py             # Authentication & user management
 │   │   ├── nodes.py            # Node CRUD operations
-│   │   └── oxidized_api.py     # Oxidized API integration
+│   │   ├── oxidized_api.py     # Oxidized API integration
+│   │   ├── pages.py            # Page routing blueprint (v1.2.0 new)
+│   │   ├── config_api.py       # Oxidized config API (v1.2.0 new)
+│   │   ├── credentials_api.py  # Device credential API (v1.2.0 new)
+│   │   ├── groups_api.py       # Device group API (v1.2.0 new)
+│   │   └── models_api.py       # Device model API (v1.2.0 new)
 │   ├── services/                # Business logic services
 │   │   ├── docker_service.py   # Docker container operations
-│   │   └── oxidized_service.py # Oxidized API client
+│   │   ├── oxidized_service.py # Oxidized API client
+│   │   └── config_service.py  # Oxidized config service (v1.2.0 new)
+│   ├── static/                  # Static resources (v1.2.0 refactored)
+│   │   ├── css/
+│   │   │   ├── dashboard.css
+│   │   │   ├── login.css
+│   │   │   └── force_change_password.css
+│   │   └── js/
+│   │       ├── dashboard.js     # Dashboard logic (v1.2.0 new)
+│   │       └── i18n.js          # Internationalization (v1.2.0 new)
+│   ├── templates/               # HTML templates (v1.2.0 refactored)
+│   │   ├── dashboard.html
+│   │   ├── login.html
+│   │   └── force_change_password.html
 │   └── tests/                   # Unit tests (pytest)
 │
 └── oxidized-config/             # Oxidized Configuration
